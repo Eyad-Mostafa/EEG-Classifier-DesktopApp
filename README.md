@@ -6,7 +6,7 @@ A powerful, offline desktop application for EEG signal analysis, preprocessing, 
 * **Import:** Support for standard CSV EEG data.
 * **Preprocessing:** Visual pipeline builder (Filtering, Artifact Removal, ICA).
 * **Analysis:** Power Spectral Density, Differential Entropy, and more.
-* **Visualization:** Interactive Topographic Maps and Charts. (Comming soon)
+* **Visualization:** Interactive Topographic Maps and Charts. (Coming soon)
 * **Privacy:** All processing happens **offline** on your device.
 
 ## 📥 Download
