@@ -18,4 +18,17 @@ A powerful, offline desktop application for EEG signal analysis, preprocessing, 
 3. The app will launch automatically.
 
 ---
-*Developed by the EEG Project Team (2025/2026 Graduation Project)*
+
+## 🧑‍💻 The Team
+
+This project was developed by:
+
+* **[Eyad Mostafa](https://github.com/Eyad-Mostafa)**
+* **[Abobaker Mohamed](https://github.com/abobakerer)**
+* **[Mennatullah Ahmed](https://github.com/Menna-Allah-A)**
+* **[Omar Nasser](https://github.com/omarnasser10)**
+
+**Supervised by:** prof. [Mohamed Fakhry](https://github.com/m-fakhry).
+
+---
+*Developed as the EEG Project Team (2025/2026 Graduation Project)*
