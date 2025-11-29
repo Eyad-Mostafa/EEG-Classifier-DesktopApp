@@ -18,4 +18,4 @@ A powerful, offline desktop application for EEG signal analysis, preprocessing, 
 3. The app will launch automatically.
 
 ---
-*Developed by the EEG Project Team (2025 Graduation Project)*
+*Developed by the EEG Project Team (2025/2026 Graduation Project)*
