@@ -2,7 +2,7 @@
 
   <img src="./icon.png" alt="EEG Classifier Logo" width="120" height="120" />
 
-  # EEG Classifier (Beta)
+  # EEG Classifier
 
   **A Professional Desktop Suite for Offline EEG Signal Analysis**
 
