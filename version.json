@@ -1,5 +1,5 @@
 {
-  "latest": "1.0.0-beta.1",
+  "latest": "1.0.0-beta.5",
   "downloadUrl": "https://github.com/Eyad-Mostafa/EEG-Classifier-DesktopApp/releases/latest",
   "notes": "Initial Beta Release. Features: CSV Upload, Preprocessing Pipeline, Some Analysis."
 }
