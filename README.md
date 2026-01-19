@@ -52,23 +52,23 @@ This project utilizes a **Hybrid Architecture** to combine the best of web techn
 
 We provide standalone installers for all major operating systems. No Python or Node.js installation is required.
 
-### [👉 Download Latest Release](https://github.com/Eyad-Mostafa/EEG-Classifier-DesktopApp/releases/latest)
+### [👉 Check All Releases and release notes](https://github.com/Eyad-Mostafa/EEG-Classifier-DesktopApp/releases/latest)
 
 ### Windows
-1. Download the file ending in `.Setup.exe`.
+1. Download from [here](https://github.com/Eyad-Mostafa/EEG-Classifier-DesktopApp/releases/latest/download/EEG.Classifier.exe)
 2. Run the installer.
 3. **Security Warning:** Since this is a university project, it is not digitally signed by Microsoft. 
    * If you see *"Windows protected your PC"*:
    * Click **More info** → Click **Run anyway**.
 
 ### macOS
-1. Download the `.dmg` file.
+1. Download from [here](https://github.com/Eyad-Mostafa/EEG-Classifier-DesktopApp/releases/latest/download/EEG.Classifier.dmg)
 2. Drag the app to your Applications folder.
 3. **Security Warning:** If you see *"App cannot be opened because the developer cannot be verified"*:
    * Right-Click the app icon → Select **Open** → Click **Open Anyway**.
 
 ### Linux
-1. Download the `.AppImage` file.
+1. Download from [here](https://github.com/Eyad-Mostafa/EEG-Classifier-DesktopApp/releases/latest/download/EEG.Classifier.AppImage)
 2. Right-click the file > Properties > Permissions > **Allow executing file as program**.
 3. Double-click to run.
 
