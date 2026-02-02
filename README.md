@@ -4,10 +4,13 @@
 
   # EEG Classifier
 
+
   **A Professional Desktop Suite for Offline EEG Signal Analysis**
 
   [![Platform](https://img.shields.io/badge/platform-win%20%7C%20mac%20%7C%20linux-lightgrey?style=flat-square)](https://github.com/Eyad-Mostafa/EEG-Classifier-DesktopApp/releases)
   [![Version](https://img.shields.io/github/v/release/Eyad-Mostafa/EEG-Classifier-DesktopApp?style=flat-square&color=3b82f6&label=version)](https://github.com/Eyad-Mostafa/EEG-Classifier-DesktopApp/releases/latest)
+  ![Downloads](https://img.shields.io/github/downloads/Eyad-Mostafa/EEG-Classifier-DesktopApp/total)
+
   
   <p align="center">
     <a href="#-algorithm-suite">Algorithms</a> •
