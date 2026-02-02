@@ -13,22 +13,22 @@
 
   
   <p align="center">
-    <a href="#-algorithm-suite">Algorithms</a> •
-    <a href="#-tech-stack">Tech Stack</a> •
-    <a href="#-download--installation">Download</a> •
+    <a href="#algorithm-suite">Algorithms</a> •
+    <a href="#tech-stack">Tech Stack</a> •
+    <a href="#download--installation">Download</a> •
     <a href="#the-team">The Team</a>
   </p>
 </div>
 
 ---
 
-## 📖 Overview
+##  Overview
 
 **EEG Classifier** is a robust, cross-platform desktop application designed for the preprocessing, analysis, and visualization of Electroencephalography (EEG) data. 
 
 Unlike web-based tools, this application runs entirely **offline**, ensuring strict data privacy and leveraging the full performance of your local machine for complex signal processing algorithms. It bridges the gap between modern UI design and powerful scientific computing.
 
-## 🚀 Algorithm Suite
+##  Algorithm Suite
 
 We have implemented a robust library of signal processing techniques powered by a **specialized Python analysis backend**. The suite is designed to handle the complete analysis lifecycle:
 
@@ -38,7 +38,7 @@ We have implemented a robust library of signal processing techniques powered by 
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 This project utilizes a **Hybrid Architecture** to combine the best of web technologies with scientific Python computing.
 
@@ -51,11 +51,11 @@ This project utilizes a **Hybrid Architecture** to combine the best of web techn
 
 ---
 
-## 📥 Download & Installation
+## Download & Installation
 
 We provide standalone installers for all major operating systems. No Python or Node.js installation is required.
 
-### [👉 Check All Releases and release notes](https://github.com/Eyad-Mostafa/EEG-Classifier-DesktopApp/releases/latest)
+### [Check All Releases and release notes](https://github.com/Eyad-Mostafa/EEG-Classifier-DesktopApp/releases/latest)
 
 ### Windows
 1. Download from [here](https://github.com/Eyad-Mostafa/EEG-Classifier-DesktopApp/releases/latest/download/EEG.Classifier.exe)
@@ -79,7 +79,7 @@ We provide standalone installers for all major operating systems. No Python or N
 
 <div id="the-team"></div>
 
-## 🧑‍💻 The Team
+## The Team
 
 This project was developed as a graduation project for the 2025/2026 academic year.
 
