@@ -87,7 +87,7 @@ This project was developed as a graduation project for the 2025/2026 academic ye
 | :--- | :--- |
 | **Eyad Mostafa** | [@Eyad-Mostafa](https://github.com/Eyad-Mostafa) |
 | **Abobaker Mohamed** | [@abobakerer](https://github.com/abobakerer) |
-| **Menna Ahmed** | [@Menna-Allah-A](https://github.com/Menna-Allah-A) |
+| **Menna-Allah Ahmed** | [@Menna-Allah-A](https://github.com/Menna-Allah-A) |
 | **Omar Nasser** | [@omarnasser10](https://github.com/omarnasser10) |
 
 <br>
