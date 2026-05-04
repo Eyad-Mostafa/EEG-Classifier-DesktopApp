@@ -13,7 +13,7 @@
 
   
   <p align="center">
-    <a href="#algorithm-suite">Algorithms</a> •
+    <a href="#features--algorithms">Features & Algorithms</a> •
     <a href="#tech-stack">Tech Stack</a> •
     <a href="#download--installation">Download</a> •
     <a href="#the-team">The Team</a>
@@ -22,30 +22,36 @@
 
 ---
 
-##  Overview
+## Overview
 
 **EEG Classifier** is a robust, cross-platform desktop application designed for the preprocessing, analysis, and visualization of Electroencephalography (EEG) data. 
 
-Unlike web-based tools, this application runs entirely **offline**, ensuring strict data privacy and leveraging the full performance of your local machine for complex signal processing algorithms. It bridges the gap between modern UI design and powerful scientific computing.
+Unlike web-based tools, this application runs entirely **offline**, ensuring strict data privacy and leveraging the full performance of your local machine. It bridges the gap between modern UI design and powerful scientific computing, complete with local session tracking to manage your workflow securely.
 
-##  Algorithm Suite
+---
 
-We have implemented a robust library of signal processing techniques powered by a **specialized Python analysis backend**. The suite is designed to handle the complete analysis lifecycle:
+<div id="features--algorithms"></div>
+
+## Features & Algorithms
+
+We have implemented a robust library of signal processing and classification techniques powered by a specialized Python backend. The suite is designed to handle the complete analysis lifecycle:
 
 * **Advanced Preprocessing:** A complete pipeline for signal conditioning, automated artifact removal, and adaptive filtering.
-* **Spectral Analysis:** Tools for investigating frequency dynamics, including Power Spectral Density (PSD) and Time-Frequency distributions.
-* **Feature Extraction:** Specialized metrics for deep analysis, such as Differential Entropy and Connectivity mapping.
+* **Feature Extraction & Spectral Analysis:** Tools for investigating frequency dynamics (PSD, Time-Frequency distributions) and deep analysis metrics like Differential Entropy.
+* **Automated Classification:** Integrated deep learning inference (utilizing pre-trained CNN-LSTM and EEGNet models) for fast, automated signal classification.
+* **Local Session History:** A secure, embedded local database that tracks and saves past analysis sessions, allowing you to review previous predictions and datasets without re-processing.
 
 ---
 
 ## Tech Stack
 
-This project utilizes a **Hybrid Architecture** to combine the best of web technologies with scientific Python computing.
+This project utilizes a **Hybrid Architecture** to combine the best of web technologies with scientific computing.
 
 | Component | Technology | Description |
 | :--- | :--- | :--- |
 | **Frontend** | ![Angular](https://img.shields.io/badge/-Angular-dd0031?style=flat-square&logo=angular&logoColor=white) | UI/UX, State Management, Visualization |
-| **Backend** | ![Python](https://img.shields.io/badge/-Python-3776AB?style=flat-square&logo=python&logoColor=white) | FastAPI engine for Signal Processing (Scipy, MNE, Sklearn) |
+| **Backend** | ![Python](https://img.shields.io/badge/-Python-3776AB?style=flat-square&logo=python&logoColor=white) | FastAPI engine handling Scipy, MNE, and PyTorch inference |
+| **Database** | ![SQLite](https://img.shields.io/badge/-SQLite-003B57?style=flat-square&logo=sqlite&logoColor=white) | Local session storage managed via Alembic migrations |
 | **Wrapper** | ![Electron](https://img.shields.io/badge/-Electron-47848F?style=flat-square&logo=electron&logoColor=white) | Desktop integration and process orchestration |
 | **CI/CD** | ![GitHub Actions](https://img.shields.io/badge/-GitHub_Actions-2088FF?style=flat-square&logo=github-actions&logoColor=white) | Automated multi-OS build and release pipeline |
 
@@ -81,7 +87,7 @@ We provide standalone installers for all major operating systems. No Python or N
 
 ## The Team
 
-This project was developed as a graduation project for the 2025/2026 academic year.
+This project was developed as a graduation project at Ain Shams University (Faculty of Science) for the 2025/2026 academic year.
 
 | Name | GitHub |
 | :--- | :--- |
@@ -98,5 +104,5 @@ This project was developed as a graduation project for the 2025/2026 academic ye
 ---
 
 <div align="center">
-  <sub>Built with ❤️ by the EEG Project Team • © 2025</sub>
+  <sub>Built with ❤️ by the EEG Project Team • © 2025-2026</sub>
 </div>
