@@ -39,7 +39,7 @@ We have implemented a robust library of signal processing and classification tec
 * **Advanced Preprocessing:** A complete pipeline for signal conditioning, automated artifact removal, and adaptive filtering.
 * **Feature Extraction & Spectral Analysis:** Tools for investigating frequency dynamics (PSD, Time-Frequency distributions) and deep analysis metrics like Differential Entropy.
 * **Automated Classification:** Integrated deep learning inference (utilizing pre-trained CNN-LSTM and EEGNet models) for fast, automated signal classification.
-* **Local Session History:** A secure, embedded local database that tracks and saves past analysis sessions, allowing you to review previous predictions and datasets without re-processing.
+* **Local Session History:** A secure, embedded local database that tracks and saves past analysis sessions, allowing you to review previous datasets, configurations, preprocessing- pipelines, etc... without re-processing.
 
 ---
 
