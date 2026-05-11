@@ -1,0 +1,28 @@
+{
+  "id": "model-eegnet-sleep-v1",
+  "name": "EEGNet (Sleep Staging)",
+  "description": "This EEGNet model is designed for high-accuracy binary sleep staging (Wake vs Sleep). It was specifically trained on the 'Fpz-Cz' and 'Pz-Oz' channels. These channels were selected because the frontal region (Fpz-Cz) perfectly captures slow-wave sleep, while the occipital region (Pz-Oz) captures the prominent alpha waves of wakefulness. Note: You are free to experiment with any two channels, but the model's accuracy (97.2%) may significantly decrease if the recommended channels are not used.",
+  "accuracy": 95.7,
+  "architecture": "EEGNet",
+  "requirements": {
+    "num_channels": 2,
+    "time_points": 1500,
+    "sampling_rate": 100,
+    "domain": "TIME"
+  },
+  "preprocessing_pipeline": [
+    {
+      "id": "bandpass_filter",
+      "params": { "low_freq": 0.5, "high_freq": 45}
+    },
+    {
+      "id": "eegnet_normalization",
+      "params": {}
+    }
+  ],
+  "classes": ["Wake (Stage W)", "Sleep (Stages 1-4, R)"],
+  "files": {
+    "pth": "eegnet_sleep.pth",
+    "image": "images/EEG_NET.png"
+  }
+}

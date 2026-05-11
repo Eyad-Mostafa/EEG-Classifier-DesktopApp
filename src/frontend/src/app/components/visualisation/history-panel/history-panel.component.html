@@ -1,0 +1,211 @@
+<div *ngIf="isOpen" class="fixed inset-0 z-50 flex justify-end overflow-hidden">
+  <div
+    class="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
+    (click)="onClose()"
+  ></div>
+
+  <div
+    class="relative h-full w-full max-w-md max-h-[100vh] bg-bg-card shadow-2xl flex flex-col"
+  >
+    <div
+      class="flex-none px-6 py-4 border-b border-border-color flex items-center justify-between"
+    >
+      <div class="min-w-0">
+        <h2 class="text-lg font-bold text-text-main">Saved Plots</h2>
+        <p class="text-xs text-text-muted truncate" *ngIf="currentFileName">
+          {{ currentFileName }}
+        </p>
+      </div>
+
+      <div class="flex items-center gap-1">
+        <button
+          *ngIf="savedPlots.length > 0"
+          type="button"
+          class="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+          (click)="onDeleteAll($event)"
+        >
+          <i class="material-icons text-base">delete_sweep</i>
+          Delete All
+        </button>
+
+        <button
+          class="p-2 hover:bg-bg-hover rounded-full transition-colors"
+          (click)="onClose()"
+          type="button"
+        >
+          <i class="material-icons">close</i>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-4 custom-scrollbar">
+      <div *ngIf="savedPlots.length === 0" class="text-center py-12">
+        <i class="material-icons text-5xl text-text-muted mb-3"
+          >history_toggle_off</i
+        >
+        <p class="text-text-muted">There are no saved plots for this file</p>
+        <p class="text-xs text-text-muted/70 mt-1">
+          Save a plot to see it here
+        </p>
+      </div>
+
+      <div *ngFor="let plot of savedPlots; trackBy: trackByPlotId" class="mb-3">
+        <div
+          class="border border-border-color rounded-xl overflow-hidden bg-bg-card"
+        >
+          <button
+            type="button"
+            class="w-full p-4 flex items-start justify-between text-left hover:bg-bg-hover/40 transition-colors"
+            (click)="toggleExpand(plot.plot_id, $event)"
+          >
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2">
+                <h3 class="font-semibold text-text-main truncate">
+                  {{ plot.plot_name }}
+                </h3>
+                <span
+                  class="px-2 py-0.5 bg-primary/10 text-primary text-[11px] rounded-full"
+                  >Plot</span
+                >
+              </div>
+              <div
+                class="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-xs text-text-muted"
+              >
+                <span>{{ formatDate(plot.created_at) }}</span>
+                <span>•</span>
+                <span>{{ getChannelsCount(plot) }} channels</span>
+                <span>•</span>
+                <span>{{ plot.filter_json.data_type || "plot" }}</span>
+              </div>
+            </div>
+            <i
+              class="material-icons text-text-muted transition-transform duration-200"
+              [class.rotate-180]="expandedPlotId === +plot.plot_id"
+              >expand_more</i
+            >
+          </button>
+
+          <div
+            *ngIf="expandedPlotId === +plot.plot_id"
+            class="px-4 pb-4 pt-2 border-t border-border-color"
+          >
+            <div
+              class="mb-3 p-3 bg-bg-hover rounded-lg border border-border-color"
+            >
+              <div class="flex items-center gap-1 mb-1">
+                <i class="material-icons text-sm text-text-muted"
+                  >account_tree</i
+                >
+                <span class="text-xs font-medium text-text-muted">Filter</span>
+              </div>
+              <p class="text-sm text-text-main whitespace-pre-wrap">
+                {{ getFilterSummary(plot) }}
+              </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-xs mb-3">
+              <div
+                class="bg-bg-hover p-2 rounded-md border border-border-color/50"
+              >
+                <span class="text-text-muted block mb-1">Subjects</span>
+                <span class="text-text-main font-medium">{{
+                  getSubjectsCount(plot)
+                }}</span>
+              </div>
+              <div
+                class="bg-bg-hover p-2 rounded-md border border-border-color/50"
+              >
+                <span class="text-text-muted block mb-1">Sessions</span>
+                <span class="text-text-main font-medium">{{
+                  getSessionsCount(plot)
+                }}</span>
+              </div>
+              <div
+                class="bg-bg-hover p-2 rounded-md border border-border-color/50"
+              >
+                <span class="text-text-muted block mb-1">Labels</span>
+                <span class="text-text-main font-medium">{{
+                  getLabelsCount(plot)
+                }}</span>
+              </div>
+              <div
+                class="bg-bg-hover p-2 rounded-md border border-border-color/50"
+              >
+                <span class="text-text-muted block mb-1">Categories</span>
+                <span class="text-text-main font-medium">{{
+                  getCategoriesCount(plot)
+                }}</span>
+              </div>
+            </div>
+
+            <div
+              class="flex items-start gap-2 bg-bg-hover p-2 rounded-md border border-border-color/50 mb-3"
+            >
+              <i class="material-icons text-[14px] text-text-muted mt-0.5"
+                >folder_open</i
+              >
+              <span
+                class="text-xs text-text-muted break-all font-mono leading-relaxed"
+                >{{ getMontage(plot) }}</span
+              >
+            </div>
+
+            <div class="flex gap-2">
+              <button
+                class="flex-1 px-3 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-hover transition-colors"
+                (click)="onGenerate(plot, $event)"
+                type="button"
+              >
+                Generate
+              </button>
+
+              <button
+                class="px-3 py-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                (click)="onDelete(plot, $event)"
+                type="button"
+              >
+                <i class="material-icons text-lg">delete</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex-none p-4 border-t border-border-color text-center">
+      <p class="text-xs text-text-muted">
+        Saved plots are linked to the current EEG file
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm: single delete -->
+<app-confirm-dialog
+  [isOpen]="showDeleteConfirm"
+  heading="Delete Plot"
+  [message]="
+    'Are you sure you want to delete \'' +
+    (pendingDeletePlot?.plot_name ?? '') +
+    '\'?'
+  "
+  secondaryMessage="This action cannot be undone."
+  confirmLabel="Delete"
+  (confirmed)="confirmDelete()"
+  (cancelled)="cancelDelete()"
+/>
+
+<!-- Confirm: delete all -->
+<app-confirm-dialog
+  [isOpen]="showDeleteAllConfirm"
+  heading="Delete All Plots"
+  [message]="
+    'Are you sure you want to delete all ' +
+    savedPlots.length +
+    ' saved plot(s)?'
+  "
+  secondaryMessage="This delete all saved plots for this configuration."
+  confirmLabel="Delete All"
+  (confirmed)="confirmDeleteAll()"
+  (cancelled)="cancelDeleteAll()"
+/>

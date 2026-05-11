@@ -1,0 +1,105 @@
+<!-- Dim layer -->
+<div class="fixed inset-0 z-[9999] bg-black/60 pointer-events-none"></div>
+
+<!-- Interactive backdrop -->
+<div class="onboarding-backdrop fixed inset-0 z-[10000] flex items-center justify-center"
+  (click)="onBackdropClick($event)">
+
+  <!-- Highlight ring -->
+  <div *ngIf="highlightRect" class="fixed pointer-events-none z-[10002] rounded-lg" style="
+      border: 2px solid #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.25), 0 0 20px 4px rgba(59,130,246,0.2);
+      transition: top 0.3s cubic-bezier(.4,0,.2,1),
+                  left 0.3s cubic-bezier(.4,0,.2,1),
+                  width 0.3s cubic-bezier(.4,0,.2,1),
+                  height 0.3s cubic-bezier(.4,0,.2,1);
+    " [style.top.px]="highlightRect.top" [style.left.px]="highlightRect.left" [style.width.px]="highlightRect.width"
+    [style.height.px]="highlightRect.height">
+  </div>
+
+  <!-- SVG pointer line -->
+  <svg *ngIf="lineCoords" class="fixed inset-0 pointer-events-none z-[10001]" style="width: 100vw; height: 100vh;"
+    xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="ob-arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+        <polygon points="0 0, 8 3, 0 6" fill="rgba(255,255,255,0.65)" />
+      </marker>
+    </defs>
+    <path [attr.d]="lineCoords.d" stroke="rgba(255,255,255,0.55)" stroke-width="2" stroke-dasharray="6,4" fill="none"
+      marker-end="url(#ob-arrow)" />
+    <circle [attr.cx]="lineCoords.x1" [attr.cy]="lineCoords.y1" r="4.5" fill="#3b82f6" />
+  </svg>
+
+  <!-- Close button — floats outside the card, top-right of viewport -->
+  <button class="fixed top-4 right-4 z-[10003] w-9 h-9 rounded-full flex items-center justify-center
+           bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-colors" (click)="close()">
+    <i class="material-icons text-lg">close</i>
+  </button>
+
+  <!-- Card wrapper — relative so we can position the page label strip -->
+  <div class="onboarding-card relative w-[480px] min-h-[400px] bg-bg-card border border-border-color
+           rounded-2xl shadow-2xl text-center mx-4 animate-in zoom-in-95 duration-300
+           flex flex-col overflow-hidden" (click)="$event.stopPropagation()">
+
+    <!-- Page label — full-width header strip at top of card -->
+    <div *ngIf="step.pageLabel"
+      class="flex items-center justify-center gap-2 px-6 py-3 bg-primary/8 border-b border-primary/15">
+      <i class="material-icons text-primary" style="font-size: 15px;">layers</i>
+      <span class="text-xs font-semibold text-primary tracking-wide uppercase">{{ step.pageLabel }}</span>
+    </div>
+
+    <!-- Card body -->
+    <div class="flex flex-col flex-1 px-8 pb-8" [class.pt-8]="step.pageLabel" [class.pt-10]="!step.pageLabel">
+
+      <!-- Icon -->
+      <div class="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20
+                  flex items-center justify-center mx-auto mb-5">
+        <i class="material-icons text-3xl text-primary">{{ step.icon }}</i>
+      </div>
+
+      <!-- Title -->
+      <h3 class="text-2xl font-bold text-text-main mb-3">{{ step.title }}</h3>
+
+      <!-- Description -->
+      <p class="text-text-muted text-base leading-relaxed">{{ step.description }}</p>
+
+      <!-- Tip -->
+      <div *ngIf="step.tip" class="flex items-start gap-3 text-left bg-amber-500/10 border border-amber-500/25
+               rounded-xl px-4 py-3 mt-5">
+        <i class="material-icons text-amber-400 flex-shrink-0"
+          style="font-size: 17px; margin-top: 1px;">tips_and_updates</i>
+        <p class="text-sm text-amber-300 leading-relaxed">{{ step.tip }}</p>
+      </div>
+
+      <!-- Spacer -->
+      <div class="flex-1"></div>
+
+      <!-- Progress dots -->
+      <div class="flex items-center justify-center gap-2 mt-7">
+        <button *ngFor="let s of steps; let i = index"
+          class="h-2 rounded-full transition-all duration-300 cursor-pointer" [class.w-6]="i === currentStep"
+          [class.w-2]="i !== currentStep" [class.bg-primary]="i === currentStep"
+          [class.bg-border-color]="i !== currentStep" (click)="goTo(i)">
+        </button>
+      </div>
+
+      <p class="text-xs text-text-muted mt-2 mb-5">
+        Step {{ currentStep + 1 }} of {{ steps.length }}
+      </p>
+
+      <!-- Buttons -->
+      <div class="flex gap-3">
+        <button *ngIf="!isFirst" class="btn-secondary flex-none" (click)="prev()">
+          <i class="material-icons text-base">arrow_back</i>
+        </button>
+        <button *ngIf="isFirst" class="btn-secondary flex-none text-sm px-5" (click)="close()">
+          Skip tour
+        </button>
+        <button class="btn-primary flex-1 justify-center py-3 text-base" (click)="next()">
+          {{ isLast ? 'Get started' : 'Next' }}
+          <i class="material-icons text-base">{{ isLast ? 'check' : 'arrow_forward' }}</i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

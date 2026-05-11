@@ -1,0 +1,45 @@
+<div
+  *ngIf="isOpen"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+  (click)="cancelled.emit()"
+>
+  <div
+    class="bg-bg-card border border-border-color rounded-2xl shadow-2xl max-w-lg w-[90%] p-6 animate-in zoom-in-95 duration-200"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Icon + Title -->
+    <div class="flex items-center gap-4 text-red-600 dark:text-red-400 mb-4">
+      <i class="material-icons text-3xl">warning</i>
+      <h2 class="text-xl font-bold text-text-main">{{ heading }}</h2>
+    </div>
+
+    <!-- Message -->
+    <p class="text-text-muted mb-2 leading-relaxed">{{ message }}</p>
+    <p *ngIf="secondaryMessage" class="text-text-muted mb-6 leading-relaxed">
+      {{ secondaryMessage }}
+    </p>
+    <div *ngIf="!secondaryMessage" class="mb-6"></div>
+
+    <!-- Actions -->
+    <div class="flex justify-end gap-3">
+      <button
+        class="px-5 py-2.5 rounded-lg font-bold text-text-main bg-bg-hover hover:bg-border-color transition-colors"
+        [disabled]="isLoading"
+        (click)="cancelled.emit()"
+      >
+        Cancel
+      </button>
+
+      <button
+        class="px-5 py-2.5 rounded-lg font-bold text-white bg-red-600 hover:bg-red-700 transition-colors flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+        [disabled]="isLoading"
+        (click)="confirmed.emit()"
+      >
+        <i *ngIf="isLoading" class="material-icons text-[18px] animate-spin"
+          >autorenew</i
+        >
+        {{ isLoading ? "Deleting..." : confirmLabel }}
+      </button>
+    </div>
+  </div>
+</div>

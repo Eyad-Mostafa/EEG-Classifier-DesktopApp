@@ -1,0 +1,344 @@
+<div class="bg-bg-main min-h-screen p-6 md:p-8 transition-colors duration-300 overflow-x-hidden">
+
+  <div class="max-w-7xl mx-auto pb-20">
+
+    <div class="flex flex-col xl:flex-row justify-between items-start mb-10 gap-6">
+
+      <div class="w-full xl:w-auto">
+        <div class="flex items-center gap-3 mb-2">
+          <h1 class="text-3xl font-bold text-text-main">Analysis Dashboard</h1>
+
+          <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border" [ngClass]="{
+                'bg-blue-100 text-blue-700 border-blue-200': (selectedFileType === 'uploaded' ? DomainType.TIME : (workflowService.getDomainType() || DomainType.TIME)) === DomainType.TIME,
+                'bg-purple-100 text-purple-700 border-purple-200': selectedFileType === 'result' && workflowService.getDomainType() === DomainType.FREQUENCY,
+                'bg-orange-100 text-orange-700 border-orange-200': selectedFileType === 'result' && workflowService.getDomainType() === DomainType.TIME_FREQUENCY
+              }">
+            {{ selectedFileType === 'uploaded' ? 'Time' : (workflowService.getDomainType() || 'Time') }} Domain
+          </span>
+        </div>
+
+        <p class="text-lg text-text-muted mb-6">
+          Comprehensive analysis of your <strong>EEG data</strong>
+        </p>
+
+        <div class="bg-bg-card border border-border-color rounded-lg shadow-sm p-1 inline-flex items-center gap-2"
+          *ngIf="workflowService.uploadedFileName$ | async as uploadedName; else noFile">
+
+          <div *ngIf="workflowService.getResultFileId(); else onlyUploaded" class="flex items-center gap-2">
+            <label
+              class="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-200 select-none"
+              [class.bg-blue-50]="selectedFileType === 'uploaded'"
+              [class.dark:bg-blue-900]="selectedFileType === 'uploaded'"
+              [class.text-primary]="selectedFileType === 'uploaded'"
+              [class.hover:bg-bg-hover]="selectedFileType !== 'uploaded'">
+              <input type="radio" name="fileType" value="uploaded" [(ngModel)]="selectedFileType"
+                (ngModelChange)="onFileTypeChange()" class="hidden" />
+              <i class="material-icons text-lg">upload_file</i>
+              <span class="font-medium text-sm">{{ uploadedName }}</span>
+            </label>
+
+            <div class="w-px h-6 bg-border-color"></div>
+
+            <label
+              class="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-200 select-none"
+              [class.bg-blue-50]="selectedFileType === 'result'"
+              [class.dark:bg-blue-900]="selectedFileType === 'result'"
+              [class.text-primary]="selectedFileType === 'result'"
+              [class.hover:bg-bg-hover]="selectedFileType !== 'result'">
+              <input type="radio" name="fileType" value="result" [(ngModel)]="selectedFileType"
+                (ngModelChange)="onFileTypeChange()" class="hidden" />
+              <i class="material-icons text-lg">analytics</i>
+              <span class="font-medium text-sm">{{ (workflowService.resultFileName$ | async) || 'Processed Result'
+                }}</span>
+            </label>
+          </div>
+
+          <ng-template #onlyUploaded>
+            <div class="px-4 py-2 flex items-center gap-2 text-text-main">
+              <i class="material-icons text-lg text-primary">description</i>
+              Analyzing: <strong>{{ uploadedName }}</strong>
+            </div>
+          </ng-template>
+        </div>
+
+        <ng-template #noFile>
+          <div
+            class="inline-flex items-center gap-2 bg-red-50 text-red-600 px-4 py-2 rounded border border-red-200 font-medium text-sm">
+            <i class="material-icons text-lg">warning</i> No file uploaded
+          </div>
+        </ng-template>
+      </div>
+
+      <div class="flex gap-3 w-full xl:w-auto justify-end">
+        <button *ngIf="!workflowService.getResultFileId()" class="btn-secondary" (click)="navigateToPreprocessing()">
+          <i class="material-icons text-lg">arrow_back</i> Preprocessing
+        </button>
+        <button class="btn-primary shadow-lg shadow-primary/20" (click)="navigateToVisualization()">
+          <i class="material-icons text-lg">visibility</i> Visualizations
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage"
+      class="mb-8 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-700 dark:text-red-300 font-medium shadow-sm flex items-center gap-3 animate-in slide-in-from-top-2">
+      <i class="material-icons text-xl">error_outline</i>
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="workflowService.getResultFileId() || workflowService.getConfiguredFileId()"
+      class="bg-bg-card border border-border-color rounded-xl shadow-sm overflow-hidden min-h-[600px]">
+
+      <div class="flex border-b border-border-color bg-bg-main/30">
+        <button
+          class="flex-1 md:flex-none px-8 py-4 text-sm font-bold border-b-2 transition-all duration-200 hover:bg-bg-hover focus:outline-none uppercase tracking-wider"
+          [class.border-primary]="activeTab === 'overview'" [class.text-primary]="activeTab === 'overview'"
+          [class.border-transparent]="activeTab !== 'overview'" [class.text-text-muted]="activeTab !== 'overview'"
+          (click)="setActiveTab('overview')">
+          Overview
+        </button>
+        <button
+          class="flex-1 md:flex-none px-8 py-4 text-sm font-bold border-b-2 transition-all duration-200 hover:bg-bg-hover focus:outline-none uppercase tracking-wider"
+          [class.border-primary]="activeTab === 'detailed'" [class.text-primary]="activeTab === 'detailed'"
+          [class.border-transparent]="activeTab !== 'detailed'" [class.text-text-muted]="activeTab !== 'detailed'"
+          (click)="setActiveTab('detailed')">
+          Detailed Analysis
+        </button>
+      </div>
+
+      <div class="p-6 md:p-8 bg-bg-card">
+
+        <div *ngIf="activeTab === 'overview'" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div *ngFor="let method of displayedMethods"
+            class="bg-bg-card border border-border-color rounded-xl p-5 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col h-full group relative overflow-hidden">
+
+            <div
+              class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-t-xl">
+            </div>
+
+            <div class="flex justify-between items-start mb-4">
+              <h3 class="text-lg font-bold text-text-main line-clamp-1 group-hover:text-primary transition-colors"
+                title="{{ method.name }}">
+                {{ method.name }}
+              </h3>
+              <button (click)="openDetails(method)"
+                class="text-text-muted hover:text-primary transition-colors p-1.5 rounded-md hover:bg-bg-hover"
+                title="View Details">
+                <i class="material-icons text-xl">info</i>
+              </button>
+            </div>
+
+            <p class="text-sm text-text-muted mb-5 line-clamp-2 h-10 leading-relaxed">{{ method.description }}</p>
+
+            <div
+              class="flex-1 bg-bg-hover/30 rounded-lg border border-dashed border-border-color flex items-center justify-center p-2 min-h-[240px] relative overflow-hidden group/viz">
+
+              <div *ngIf="hasAnalysisResults(method.id) && getTopographicMapData(method.id)"
+                class="w-full h-full flex items-center justify-center p-2">
+                <img [src]="getTopographicMapData(method.id)"
+                  class="max-w-full max-h-full object-contain rounded shadow-sm transition-transform duration-300 group-hover/viz:scale-105 cursor-pointer"
+                  (click)="setActiveTab('detailed'); toggleMethodExpansion(method.id)" title="Click to see details" />
+              </div>
+
+              <div *ngIf="isMethodPending(method.id)" class="flex flex-col items-center justify-center h-full w-full">
+                <app-loader message="Analyzing..."></app-loader>
+              </div>
+
+              <div *ngIf="!hasAnalysisResults(method.id) && !isMethodPending(method.id)"
+                class="flex flex-col items-center gap-4 z-10">
+                <i class="material-icons text-4xl text-border-color">analytics</i>
+                <button class="btn-primary py-2 px-6 text-sm shadow-md" (click)="runAnalysis(method.id)">
+                  Run Analysis
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="activeTab === 'detailed'" class="space-y-6 max-w-5xl mx-auto">
+
+          <div *ngFor="let method of displayedMethods"
+            class="border border-border-color rounded-xl overflow-hidden bg-bg-card shadow-sm transition-all duration-300"
+            [class.ring-2]="expandedModuleId === method.id" [class.ring-primary]="expandedModuleId === method.id"
+            [class.ring-opacity-50]="expandedModuleId === method.id">
+
+            <div class="flex items-center justify-between p-6 cursor-pointer hover:bg-bg-hover/50 transition-colors"
+              (click)="toggleMethodExpansion(method.id)">
+
+              <div class="flex items-center gap-5">
+
+                <div
+                  class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300 border relative overflow-hidden"
+                  [ngClass]="{
+        'bg-green-100 text-green-600 border-green-200': hasAnalysisResults(method.id),
+        'bg-bg-card border-primary': isMethodPending(method.id),        'bg-gray-100 text-gray-400 border-gray-200 dark:bg-slate-800 dark:border-slate-700': !hasAnalysisResults(method.id) && !isMethodPending(method.id)
+          }">
+
+                  <i class="material-icons text-2xl" *ngIf="hasAnalysisResults(method.id)">check</i>
+
+                  <div *ngIf="isMethodPending(method.id)" class="absolute inset-0 flex items-center justify-center">
+                    <div class="transform scale-[0.3]"><app-loader></app-loader></div>
+                  </div>
+
+                  <i class="material-icons text-2xl"
+                    *ngIf="!hasAnalysisResults(method.id) && !isMethodPending(method.id)">play_arrow</i>
+                </div>
+
+                <div>
+                  <div class="flex items-center gap-3 mb-1">
+                    <h3 class="text-xl font-bold text-text-main">{{ method.name }}</h3>
+                    <button (click)="$event.stopPropagation(); openDetails(method)"
+                      class="text-text-muted hover:text-primary transition-colors" title="View Details">
+                      <i class="material-icons text-lg">info</i>
+                    </button>
+                  </div>
+                  <p class="text-sm text-text-muted line-clamp-1">{{ method.description }}</p>
+                </div>
+              </div>
+
+              <i class="material-icons text-2xl text-text-muted transition-transform duration-300"
+                [class.rotate-180]="expandedModuleId === method.id">expand_more</i>
+            </div>
+
+            <div *ngIf="expandedModuleId === method.id"
+              class="border-t border-border-color p-6 bg-bg-hover/10 animate-fade-in-down">
+
+              <div class="flex flex-col gap-6 h-full w-full">
+
+                <div
+                  class="w-full bg-bg-card border border-border-color rounded-xl p-6 flex items-center justify-center min-h-[400px] shadow-sm relative">
+                  <div *ngIf="hasAnalysisResults(method.id) && getTopographicMapData(method.id); else noViz"
+                    class="w-full h-full flex justify-center items-center">
+                    <img [src]="getTopographicMapData(method.id)"
+                      class="max-w-full max-h-[500px] object-contain rounded-lg shadow-sm" />
+                  </div>
+                  <ng-template #noViz>
+                    <div class="text-center z-10">
+                      <div *ngIf="isMethodPending(method.id); else runBtn">
+                        <app-loader message="Analyzing..."></app-loader>
+                      </div>
+                      <ng-template #runBtn>
+                        <div class="w-16 h-16 bg-bg-hover rounded-full flex items-center justify-center mx-auto mb-4">
+                          <i class="material-icons text-3xl text-text-muted">bar_chart</i>
+                        </div>
+                        <p class="text-text-muted mb-6 font-medium">No visualization generated yet.</p>
+                        <button class="btn-primary shadow-lg shadow-primary/20" (click)="runAnalysis(method.id)">
+                          Run Analysis Now
+                        </button>
+                      </ng-template>
+                    </div>
+                  </ng-template>
+                </div>
+
+                <div class="w-full" *ngIf="hasAnalysisResults(method.id)">
+
+                  <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                      <h4 class="text-xs font-bold text-text-muted uppercase tracking-wider">Results Data</h4>
+                      <span
+                        class="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded border border-green-100">Success</span>
+                    </div>
+                    <button
+                      class="text-xs flex items-center gap-1 text-primary hover:text-primary-hover hover:underline transition-colors"
+                      (click)="copyData(getAnalysisResults(method.id)?.analysis_data)">
+                      <i class="material-icons text-sm">content_copy</i> Copy All JSON
+                    </button>
+                  </div>
+
+                  <div
+                    class="bg-bg-main border border-border-color rounded-xl overflow-hidden shadow-inner max-h-[400px] overflow-y-auto custom-scrollbar">
+
+                    <div *ngIf="isObject(getAnalysisResults(method.id)?.analysis_data)"
+                      class="divide-y divide-border-color">
+                      <div *ngFor="let entry of getAsObject(getAnalysisResults(method.id)?.analysis_data) | keyvalue"
+                        class="p-3 flex flex-col sm:flex-row justify-between gap-2 hover:bg-bg-hover/50 transition-colors group/row">
+
+                        <span class="text-xs font-bold text-text-muted uppercase tracking-wide pt-1">{{
+                          formatKey(entry.key) }}</span>
+
+                        <span class="text-sm font-mono text-text-main text-right break-all relative">
+
+                          <ng-container *ngIf="isPrimitive(entry.value)">
+                            {{ entry.value }}
+                          </ng-container>
+
+                          <ng-container *ngIf="!isPrimitive(entry.value)">
+                            <div class="inline-block ml-2">
+                              <button (click)="expandedPreviews[entry.key] = !expandedPreviews[entry.key]"
+                                class="cursor-pointer text-xs font-bold px-2 py-1 rounded bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-colors">
+                                Complex Data <i class="material-icons text-[10px] ml-1">visibility</i>
+                              </button>
+
+                              <div *ngIf="expandedPreviews[entry.key]" class="fixed inset-0 z-[9998]"
+                                (click)="expandedPreviews[entry.key] = false"
+                                (wheel)="expandedPreviews[entry.key] = false">
+                              </div>
+
+                              <div *ngIf="expandedPreviews[entry.key]"
+                                class="fixed bottom-8 right-8 z-[9999] w-[400px] animate-in slide-in-from-bottom-4 fade-in duration-200">
+                                <div
+                                  class="bg-bg-card text-text-main rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.3)] border border-border-color flex flex-col max-h-[50vh] text-xs font-mono text-left">
+
+                                  <div
+                                    class="flex-none flex justify-between items-center p-3 border-b border-border-color bg-bg-card rounded-t-xl z-10">
+                                    <span class="text-primary font-bold uppercase">{{ formatKey(entry.key) }}</span>
+                                    <div class="flex items-center gap-3">
+                                      <span
+                                        class="text-[10px] bg-bg-hover px-2 py-0.5 rounded text-text-muted">Preview</span>
+                                      <button (click)="expandedPreviews[entry.key] = false"
+                                        class="text-text-muted hover:text-red-500 transition-colors flex items-center justify-center">
+                                        <i class="material-icons text-sm">close</i>
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  <div class="flex-1 overflow-y-auto p-3 custom-scrollbar select-text">
+                                    <pre class="text-text-muted whitespace-pre-wrap">{{ entry.value | json }}</pre>
+                                  </div>
+
+                                </div>
+                              </div>
+                            </div>
+                          </ng-container>
+
+                        </span>
+                      </div>
+                    </div>
+
+                    <div *ngIf="isArray(getAnalysisResults(method.id)?.analysis_data)" class="p-4">
+                      <pre
+                        class="text-xs text-text-main font-mono whitespace-pre-wrap">{{ getAnalysisResults(method.id)?.analysis_data | json }}</pre>
+                    </div>
+
+                    <div *ngIf="!getAnalysisResults(method.id)?.analysis_data"
+                      class="p-8 text-center text-text-muted italic">No data available.</div>
+
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div *ngIf="showDetailsPanel" class="fixed inset-0 z-[200] flex justify-end overflow-hidden">
+  <div class="absolute inset-0 bg-black/30 backdrop-blur-[2px] animate-in fade-in duration-200"
+    (click)="closeDetails()"></div>
+  <div class="relative h-full w-full max-w-md shadow-2xl animate-in slide-in-from-right duration-300">
+    <app-algorithm-details [algorithmId]="selectedAlgorithmId" type="analysis"
+      (close)="closeDetails()"></app-algorithm-details>
+  </div>
+</div>
+
+<div *ngIf="analysisMethods.length === 0 && !errorMessage"
+  class="fixed inset-0 bg-bg-main/80 backdrop-blur-sm z-[999] flex items-center justify-center">
+  <div class="bg-bg-card rounded-2xl shadow-2xl border border-border-color">
+    <app-loader message="Loading Dashboard" subMessage="Fetching available algorithms..."></app-loader>
+  </div>
+</div>

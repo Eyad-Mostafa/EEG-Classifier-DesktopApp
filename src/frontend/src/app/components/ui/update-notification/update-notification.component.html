@@ -1,0 +1,44 @@
+<div *ngIf="updateInfo"
+  class="fixed bottom-6 right-6 z-[9999] w-80 animate-in slide-in-from-bottom-4 fade-in duration-500">
+
+  <div
+    class="bg-bg-card border border-border-color border-l-4 border-l-primary rounded-lg shadow-2xl p-5 flex flex-col gap-4">
+
+    <!-- Header Section -->
+    <div class="flex items-start gap-3">
+      <div class="p-2 bg-primary/10 rounded-full text-primary flex-shrink-0">
+        <i class="material-icons text-xl">system_update</i>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-text-main text-sm">New Update Available!</h4>
+        <p class="text-xs text-text-muted mt-1">Version <strong>v{{ updateInfo.latest }}</strong> is ready to install.
+        </p>
+      </div>
+    </div>
+
+    <!-- Release Notes Section -->
+    <div *ngIf="updateInfo.notes" class="bg-black/5 dark:bg-white/5 p-3 rounded-md border border-border-color/50">
+      <span class="text-[11px] font-bold text-text-main uppercase tracking-wider mb-1 block">What's New:</span>
+
+      <p
+        class="text-xs text-text-muted leading-relaxed whitespace-pre-line max-h-24 overflow-y-auto pr-2 custom-scrollbar">
+        {{ updateInfo.notes }}
+      </p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-end gap-3 items-center mt-1">
+      <button (click)="dismiss()"
+        class="text-xs font-medium text-text-muted hover:text-text-main transition-colors px-2 py-1 rounded hover:bg-bg-hover">
+        Later
+      </button>
+
+      <a [href]="updateInfo.downloadUrl" target="_blank"
+        class="px-4 py-1.5 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded shadow-sm transition-all active:scale-95 flex items-center gap-1 decoration-none">
+        <i class="material-icons text-[14px]">download</i> Download
+      </a>
+    </div>
+
+  </div>
+</div>

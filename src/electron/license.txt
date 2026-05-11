@@ -1,0 +1,44 @@
+END USER LICENSE AGREEMENT (EULA)
+
+Product: EEG Classifier
+Version: 2.1.1
+Copyright (c) 2025-2026 The EEG Project Team
+(Eyad-Mostafa, abobakerer, Menna-Allah-A, omarnasser10)
+
+-----------------------------------------------------------------------
+
+IMPORTANT: PLEASE READ CAREFULLY.
+By installing, copying, or using this software ("Software"), you agree to be bound by the terms of this agreement. If you do not agree, do not install or use the Software.
+
+-----------------------------------------------------------------------
+
+SECTION 1: ACADEMIC AND RESEARCH USE ONLY - NOT A MEDICAL DEVICE
+
+NOTICE TO USER: 
+This software was developed as part of a university graduation project. It is intended strictly for educational, research, and demonstration purposes.
+
+1. NO MEDICAL ADVICE: This software is NOT a certified medical device. It has not been evaluated or approved by any medical regulatory agency.
+2. NO DIAGNOSIS: The output, classification results, and analysis provided by this software should NEVER be used for medical diagnosis, treatment, or prevention of any disease or health condition.
+3. DATA PRIVACY: Users are responsible for ensuring that any EEG data processed by this application complies with local data privacy regulations.
+
+-----------------------------------------------------------------------
+
+SECTION 2: GRANT OF LICENSE & RESTRICTIONS (PROTECTING OUR WORK)
+
+1. LICENSE GRANT: The EEG Project Team grants you a personal, non-transferable, non-exclusive license to use the object code of the Software on a single computer, solely for personal, educational, or non-commercial research purposes.
+
+2. COPYRIGHT & OWNERSHIP: The Software is the intellectual property of The EEG Project Team. The structure, organization, and source code of the Software are the valuable trade secrets and confidential information of The EEG Project Team. The Software is protected by law, including but not limited to copyright laws and international treaty provisions.
+
+3. RESTRICTIONS: You may NOT:
+   a) Modify, adapt, translate, or create derivative works based upon the Software.
+   b) Reverse engineer, decompile, disassemble, or otherwise attempt to discover the source code of the Software.
+   c) Rent, lease, sell, or sublicense the Software to any third party.
+   d) Remove any proprietary notices, labels, or marks from the Software.
+
+-----------------------------------------------------------------------
+
+SECTION 3: DISCLAIMER OF WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. THE AUTHORS MAKE NO WARRANTIES, EXPRESS OR IMPLIED, THAT THE SOFTWARE IS FREE OF ERROR OR THAT IT WILL MEET YOUR REQUIREMENTS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY DAMAGES ARISING OUT OF THE USE OF THIS SOFTWARE.
+
+-----------------------------------------------------------------------

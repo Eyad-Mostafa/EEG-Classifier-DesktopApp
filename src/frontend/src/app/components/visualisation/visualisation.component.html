@@ -1,0 +1,603 @@
+<div
+  class="flex h-full w-full bg-bg-main overflow-y-auto custom-scrollbar transition-colors duration-300"
+>
+  <div
+    class="w-full max-w-[1200px] mx-auto p-6 md:p-8 flex flex-col relative transform scale-[0.98] origin-top transition-transform duration-300"
+  >
+    <div
+      *ngIf="!loading && rawFileId"
+      class="flex justify-between items-end mb-8 flex-none"
+    >
+      <div>
+        <h1 class="text-3xl font-bold text-text-main mb-1">
+          Signal Visualization
+        </h1>
+        <p class="text-base text-text-muted">
+          Real-time inspection of time-series and spectral data.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button
+          (click)="openHistoryPanel()"
+          class="px-6 py-2 rounded-lg bg-bg-hover text-text-main text-base font-bold hover:bg-primary/10 transition-colors flex items-center gap-2 border border-border-color"
+          type="button"
+        >
+          <i class="material-icons text-base">history</i>
+          History
+        </button>
+
+        <button
+          (click)="openAddPlotModal()"
+          class="px-6 py-2 rounded-lg bg-primary text-white text-base font-bold hover:bg-primary-hover transition-colors flex items-center gap-2"
+          type="button"
+        >
+          <i class="material-icons text-base">add</i>
+          Add Plot
+        </button>
+      </div>
+    </div>
+    <div
+      *ngIf="!loading && !rawFileId"
+      class="mx-3 mt-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 font-medium flex items-center gap-3"
+    >
+      <i class="material-icons">error_outline</i>
+      <p class="font-semibold">No EEG file found</p>
+      <a
+        routerLink="/upload"
+        class="inline-block text-base font-medium text-primary hover:text-primary-hover hover:underline transition-colors cursor-pointer"
+      >
+        Upload an EEG file to inspect your signals →
+      </a>
+    </div>
+
+    <div *ngIf="!loading && rawFileId" class="space-y-8 pb-20">
+      <div class="grid grid-cols-1 gap-8">
+        <div
+          class="bg-bg-card border border-border-color rounded-xl shadow-sm flex flex-col overflow-hidden"
+        >
+          <div
+            class="px-6 py-4 border-b border-border-color bg-bg-hover/30 flex justify-between items-center"
+          >
+            <div class="flex items-center gap-3">
+              <span
+                class="w-2.5 h-2.5 rounded-full bg-red-500 shadow-sm"
+              ></span>
+              <h3 class="font-bold text-text-main text-base">
+                Raw EEG Signals
+              </h3>
+            </div>
+            <span
+              class="text-[10px] uppercase tracking-wider text-text-muted font-bold bg-bg-main px-2 py-1 rounded border border-border-color"
+              >Time Domain</span
+            >
+          </div>
+          <div class="p-2 bg-bg-card h-[450px] w-full relative">
+            <div id="rawPlot" class="w-full h-full"></div>
+          </div>
+        </div>
+
+        <div
+          *ngIf="isFilePreprocessed"
+          class="bg-bg-card border border-border-color rounded-xl shadow-sm flex flex-col overflow-hidden"
+        >
+          <div
+            class="px-6 py-4 border-b border-border-color bg-bg-hover/30 flex justify-between items-center"
+          >
+            <div class="flex items-center gap-3">
+              <span
+                class="w-2.5 h-2.5 rounded-full bg-green-500 shadow-sm"
+              ></span>
+              <h3 class="font-bold text-text-main text-base">
+                Preprocessed Signals
+              </h3>
+            </div>
+            <span
+              class="text-[10px] uppercase tracking-wider text-text-muted font-bold bg-bg-main px-2 py-1 rounded border border-border-color"
+              >Time Domain</span
+            >
+          </div>
+          <div class="p-2 bg-bg-card h-[450px] w-full relative">
+            <div id="cleanPlot" class="w-full h-full"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-8 mt-8">
+        <div *ngFor="let plot of dynamicPlots">
+          <div
+            class="bg-bg-card border border-border-color rounded-xl shadow-sm overflow-hidden"
+          >
+            <div
+              class="px-6 py-3 flex justify-between items-center bg-bg-hover/30 border-b border-border-color relative"
+            >
+              <!-- LEFT SIDE -->
+              <div class="flex items-center gap-3">
+                <h3 class="font-bold text-text-main text-base">
+                  {{ plot.title }}
+                </h3>
+
+                <!-- Info Button -->
+                <div class="relative group">
+                  <button
+                    class="text-primary hover:text-primary-hover transition-colors cursor-pointer focus:outline-none"
+                  >
+                    <i class="material-icons text-2xl">info</i>
+                  </button>
+
+                  <!-- Popup -->
+                  <div
+                    class="absolute top-10 left-0 w-[460px] max-h-80 overflow-y-auto bg-bg-card border border-border-color rounded-xl shadow-2xl p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50"
+                  >
+                    <div class="text-lg font-semibold text-text-main">
+                      {{ plot.trialsCount }} Trials Info
+                    </div>
+
+                    <div
+                      *ngFor="let t of plot.trialsMeta"
+                      class="border border-border-color rounded-lg p-4 mb-3 bg-bg-hover/20 hover:bg-bg-hover/40 transition"
+                    >
+                      <div class="flex items-center justify-between">
+                        <div
+                          class="px-3 py-1 rounded-full text-xs font-semibold bg-primary/20 text-primary border border-primary/30"
+                        >
+                          Plot Trial: {{ t.trialPlotIndex }}
+                        </div>
+                      </div>
+
+                      <div class="ml-3 mt-3 grid grid-cols-2 gap-y-2 text-sm">
+                        <div class="text-text-muted">Trial Id</div>
+                        <div class="text-text-main font-medium">
+                          {{ t.trialFileId }}
+                        </div>
+
+                        <div class="text-text-muted">Subject</div>
+                        <div class="text-text-main font-medium">
+                          {{ t.subject }}
+                        </div>
+
+                        <div class="text-text-muted">Session</div>
+                        <div class="text-text-main font-medium">
+                          {{ t.session }}
+                        </div>
+
+                        <div class="text-text-muted">Label</div>
+                        <div class="text-text-main font-medium">
+                          {{ t.label }}
+                        </div>
+
+                        <div class="text-text-muted">Category</div>
+                        <div class="text-text-main font-medium">
+                          {{ t.category }}
+                        </div>
+
+                        <div class="text-text-muted">Time Range</div>
+                        <div class="text-text-main font-medium">
+                          {{ t.start | number: "1.2-2" }}s →
+                          {{ t.end | number: "1.2-2" }}s
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- RIGHT SIDE -->
+              <div class="flex items-center gap-2 shrink-0 whitespace-nowrap">
+                <button
+                  (click)="openSaveModal(plot)"
+                  type="button"
+                  class="w-8 h-8 rounded-lg flex items-center justify-center bg-primary text-white hover:bg-primary-hover transition"
+                >
+                  <i class="material-icons text-base">save</i>
+                </button>
+
+                <button
+                  (click)="removePlot(plot.id)"
+                  type="button"
+                  class="w-8 h-8 rounded-lg flex items-center justify-center bg-red-500 text-white hover:bg-red-600 transition"
+                >
+                  <i class="material-icons text-base">close</i>
+                </button>
+              </div>
+            </div>
+
+            <!-- plot container -->
+            <div class="p-2 bg-bg-card h-[450px]">
+              <div [id]="plot.id" class="w-full h-full"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 gap-8">
+        <div
+          class="bg-bg-card border border-border-color rounded-xl shadow-sm flex flex-col overflow-hidden"
+        >
+          <div
+            class="px-6 py-3 border-b border-border-color bg-bg-hover/30 flex justify-between items-center flex-wrap gap-4"
+          >
+            <div class="flex items-center gap-3">
+              <i class="material-icons text-xl text-primary">equalizer</i>
+              <h3 class="font-bold text-text-main text-base">
+                Raw Spectrogram
+              </h3>
+            </div>
+            <div
+              class="flex items-center gap-3 bg-bg-main px-3 py-1.5 rounded-lg border border-border-color"
+            >
+              <label
+                for="rawChan"
+                class="text-xs font-bold text-text-muted uppercase"
+                >Channel</label
+              >
+              <select
+                id="rawChan"
+                [(ngModel)]="selectedChannelForRaw"
+                (change)="plotRawSpectrogram(selectedChannelForRaw)"
+                [ngClass]="{
+                  'bg-white text-text-main': !isDarkMode,
+                  'bg-gray-800 text-white': isDarkMode,
+                }"
+                class="text-sm font-medium focus:outline-none cursor-pointer border border-border-color rounded px-2 py-1"
+              >
+                <option
+                  *ngFor="let ch of availableChannels; let i = index"
+                  [value]="i"
+                >
+                  {{ ch }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="p-2 bg-bg-card h-[450px] relative">
+            <div id="rawSpectrogramPlot" class="w-full h-full"></div>
+          </div>
+        </div>
+
+        <div
+          *ngIf="isFilePreprocessed"
+          class="bg-bg-card border border-border-color rounded-xl shadow-sm flex flex-col overflow-hidden"
+        >
+          <div
+            class="px-6 py-3 border-b border-border-color bg-bg-hover/30 flex justify-between items-center flex-wrap gap-4"
+          >
+            <div class="flex items-center gap-3">
+              <i class="material-icons text-xl text-green-600">equalizer</i>
+              <h3 class="font-bold text-text-main text-base">
+                Clean Spectrogram
+              </h3>
+            </div>
+            <div
+              class="flex items-center gap-3 bg-bg-main px-3 py-1.5 rounded-lg border border-border-color"
+            >
+              <label
+                for="cleanChan"
+                class="text-xs font-bold text-text-muted uppercase"
+                >Channel</label
+              >
+              <select
+                id="cleanChan"
+                [(ngModel)]="selectedChannelForClean"
+                (change)="plotCleanSpectrogram(selectedChannelForClean)"
+                [ngClass]="{
+                  'bg-white text-text-main': !isDarkMode,
+                  'bg-gray-800 text-white': isDarkMode,
+                }"
+                class="text-sm font-medium focus:outline-none cursor-pointer border border-border-color rounded px-2 py-1"
+              >
+                <option
+                  *ngFor="let ch of availableChannels; let i = index"
+                  [value]="i"
+                >
+                  {{ ch }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="p-2 bg-bg-card h-[450px] relative">
+            <div id="cleanSpectrogramPlot" class="w-full h-full"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div
+  *ngIf="loading && rawFileId"
+  class="fixed inset-0 bg-bg-main/80 backdrop-blur-sm z-50 flex items-center justify-center"
+>
+  <div class="bg-bg-card rounded-2xl shadow-2xl border border-border-color">
+    <app-loader
+      message="Generating Visualizations"
+      subMessage="Generating your signal visualizations, please wait..."
+    >
+    </app-loader>
+  </div>
+</div>
+
+<div
+  *ngIf="isAddPlotModalOpen"
+  class="fixed inset-0 z-50 bg-bg-main/80 backdrop-blur-sm flex items-center justify-center"
+  (click)="closeAddPlotModal()"
+>
+  <div
+    class="w-full max-w-xl bg-bg-card rounded-2xl shadow-2xl border border-border-color overflow-hidden"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Header -->
+    <div class="relative px-6 py-4 border-b border-border-color">
+      <h3 class="text-lg font-bold text-text-main">Create New Plot</h3>
+      <p class="text-sm text-text-muted">
+        Select the data you want to visualize
+      </p>
+
+      <!-- Close Button -->
+      <button
+        (click)="closeAddPlotModal()"
+        type="button"
+        class="absolute top-4 right-4 w-8 h-8 rounded-md flex items-center justify-center bg-bg-main text-text-main hover:bg-red-500 hover:text-text-main transition"
+      >
+        <i class="material-icons text-base leading-none">close</i>
+      </button>
+      <div
+        *ngIf="errorMessage"
+        class="mx-3 mt-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 font-medium flex items-center gap-3"
+      >
+        <i class="material-icons">error_outline</i>
+        <span>{{ errorMessage }}</span>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="p-6 space-y-4 max-h-200 overflow-y-auto">
+      <div>
+        <label class="text-base font-bold text-text-main">Data Source :</label>
+        <div class="flex gap-4 mt-2">
+          <label class="flex items-center gap-2">
+            <input
+              type="radio"
+              name="dataType"
+              value="raw"
+              [(ngModel)]="selectedDataType"
+            />
+            Raw
+          </label>
+
+          <label *ngIf="cleanSubjects" class="flex items-center gap-2">
+            <input
+              type="radio"
+              name="dataType"
+              value="clean"
+              [(ngModel)]="selectedDataType"
+            />
+            Clean
+          </label>
+        </div>
+      </div>
+
+      <!-- Subject -->
+      <div>
+        <label class="text-base font-bold text-text-main">Subject :</label>
+        <select
+          class="w-full mt-1 p-2 rounded border border-border-color bg-bg-main"
+          (ngModelChange)="onSubjectChange($event)"
+          [(ngModel)]="selectedSubjectId"
+        >
+          <option *ngFor="let s of availableSubjects" [value]="s">
+            {{ s }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Session -->
+      <div *ngIf="availableSessions.length">
+        <label class="text-base font-bold text-text-main">Session :</label>
+        <select
+          class="w-full mt-1 p-2 rounded border border-border-color bg-bg-main"
+          (ngModelChange)="onSessionChange($event)"
+          [(ngModel)]="selectedSessionId"
+        >
+          <option *ngFor="let s of availableSessions" [value]="s">
+            {{ s }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Labels -->
+      <div *ngIf="selectedSessionId && availableLabels.length > 0">
+        <label class="text-base font-bold text-text-main">Labels :</label>
+        <div class="grid grid-cols-3 gap-2 mt-2">
+          <label class="flex items-center gap-2 font-semibold">
+            <input
+              type="checkbox"
+              [checked]="isAllLabelsSelected()"
+              (change)="onAllLabelsToggle($event)"
+            />
+            All
+          </label>
+          <label *ngFor="let l of availableLabels">
+            <input
+              type="checkbox"
+              [checked]="selectedLabels.includes(l)"
+              (change)="toggleLabel(l, $event)"
+            />
+            {{ l }}
+          </label>
+        </div>
+      </div>
+
+      <!-- Categories -->
+      <div>
+        <label class="text-base font-bold text-text-main">Categories :</label>
+        <div class="grid grid-cols-3 gap-2 mt-2">
+          <label *ngFor="let c of availableCategories">
+            <input
+              type="checkbox"
+              [checked]="selectedCategories.includes(c)"
+              (change)="toggleCategory(c, $event)"
+            />
+            {{ c }}
+          </label>
+        </div>
+      </div>
+
+      <!-- Channels -->
+      <div>
+        <label class="text-base font-bold text-text-main">Channels :</label>
+        <div class="grid grid-cols-3 gap-2 mt-2">
+          <label class="flex items-center gap-2 font-semibold">
+            <input
+              type="checkbox"
+              [checked]="isAllChannelsSelected()"
+              (change)="onAllChannelsToggle($event)"
+            />
+            All
+          </label>
+          <label
+            *ngFor="let ch of availableChannels"
+            class="flex items-center gap-2"
+          >
+            <input
+              type="checkbox"
+              [checked]="selectedChannels.includes(ch)"
+              (change)="onChannelToggle(ch, $event)"
+            />
+            {{ ch }}
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div
+      class="px-6 py-4 border-t border-border-color flex justify-end gap-3 bg-bg-hover/30"
+    >
+      <button
+        (click)="closeAddPlotModal()"
+        class="px-4 py-2 text-sm font-bold text-text-muted hover:text-text-main transition"
+      >
+        Cancel
+      </button>
+
+      <button
+        (click)="createPlotFromSelection()"
+        class="px-4 py-2 rounded-lg bg-primary text-white text-sm font-bold hover:bg-primary-hover transition"
+      >
+        Create Plot
+      </button>
+    </div>
+  </div>
+</div>
+<div
+  *ngIf="isSaveModalOpen"
+  class="fixed inset-0 z-50 bg-bg-main/80 backdrop-blur-sm flex items-center justify-center"
+  (click)="closeSaveModal()"
+>
+  <div
+    class="w-full max-w-md bg-bg-card rounded-2xl shadow-2xl border border-border-color overflow-hidden"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="relative px-6 py-4 border-b border-border-color">
+      <h3 class="text-lg font-bold text-text-main">Save Plot</h3>
+      <p class="text-sm text-text-muted">Write a name for this plot</p>
+
+      <button
+        (click)="closeSaveModal()"
+        type="button"
+        class="absolute top-4 right-4 w-8 h-8 rounded-md flex items-center justify-center bg-bg-main text-text-main hover:bg-red-500 hover:text-white transition"
+      >
+        <i class="material-icons text-base leading-none">close</i>
+      </button>
+    </div>
+
+    <div class="p-6 space-y-4">
+      <div>
+        <label class="block text-base font-bold text-text-main mb-2">
+          Plot Name
+        </label>
+        <input
+          [(ngModel)]="savePlotName"
+          type="text"
+          placeholder="Enter plot name"
+          class="w-full px-4 py-2 rounded-lg bg-bg-main border border-border-color text-text-main outline-none focus:border-primary"
+        />
+      </div>
+    </div>
+
+    <div
+      class="px-6 py-4 border-t border-border-color flex justify-end gap-3 bg-bg-hover/30"
+    >
+      <button
+        (click)="closeSaveModal()"
+        class="px-4 py-2 text-sm font-bold text-text-muted hover:text-text-main transition"
+      >
+        Close
+      </button>
+
+      <button
+        (click)="savePlot()"
+        class="px-4 py-2 rounded-lg bg-primary text-white text-sm font-bold hover:bg-primary-hover transition"
+      >
+        Save
+      </button>
+    </div>
+  </div>
+</div>
+
+<div
+  *ngIf="plotStatusMessage"
+  class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[9999] w-[min(92vw,720px)]"
+>
+  <div
+    class="rounded-xl border px-4 py-3 shadow-2xl backdrop-blur-sm flex items-start justify-between gap-3"
+    [ngClass]="{
+      'border-emerald-500/30 bg-emerald-500/80 text-emerald-100':
+        plotStatusType === 'success',
+      'border-red-500/30 bg-red-500/80 text-red-100':
+        plotStatusType === 'error',
+      'border-blue-500/30 bg-blue-500/80 text-blue-100':
+        plotStatusType === 'info',
+    }"
+  >
+    <div class="flex items-start gap-3">
+      <i
+        class="material-icons mt-0.5"
+        [ngClass]="{
+          'text-emerald-200': plotStatusType === 'success',
+          'text-red-200': plotStatusType === 'error',
+          'text-blue-200': plotStatusType === 'info',
+        }"
+      >
+        {{ plotStatusType === "error" ? "error_outline" : "check_circle" }}
+      </i>
+
+      <div>
+        <p class="font-semibold">
+          {{ plotStatusMessage }}
+        </p>
+        <p class="text-sm opacity-80 mt-1">
+          You can find the generated plot below.
+        </p>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      class="text-current/70 hover:text-current transition"
+      (click)="clearPlotStatus()"
+    >
+      <i class="material-icons text-base">close</i>
+    </button>
+  </div>
+</div>
+
+<app-history-panel
+  [isOpen]="showHistoryPanel"
+  [currentFileName]="rawFileId"
+  [savedPlots]="historyItems"
+  (close)="closeHistoryPanel()"
+  (generatePlot)="onHistoryGenerate($event)"
+  (deletePlot)="onHistoryDelete($event)"
+  (deleteAllPlots)="onHistoryDeleteAll()"
+></app-history-panel>

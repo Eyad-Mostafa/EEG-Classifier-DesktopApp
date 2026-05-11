@@ -1,0 +1,221 @@
+<aside
+  class="h-full bg-bg-card border-l border-border-color overflow-hidden flex flex-col transition-[width] duration-300 ease-in-out"
+  [class.w-80]="!isCollapsed" [class.w-16]="isCollapsed">
+  <div class="h-14 shrink-0 flex items-center justify-between px-4 border-b border-border-color">
+    <div class="flex items-center gap-2 min-w-0 overflow-hidden transition-all duration-300"
+      [class.opacity-0]="isCollapsed" [class.max-w-0]="isCollapsed" [class.max-w-[220px]]="!isCollapsed">
+      <i class="material-icons text-primary">history</i>
+
+      <span class="font-semibold text-text-main whitespace-nowrap tracking-wide">
+        History
+      </span>
+
+      <span class="text-xs font-medium bg-bg-hover text-text-muted px-2 py-0.5 rounded-full">
+        {{ configurations.length }}
+      </span>
+    </div>
+
+    <div class="flex items-center gap-1">
+      <button *ngIf="!isCollapsed && configurations.length > 0"
+        class="w-7 h-7 flex items-center justify-center rounded-lg text-text-muted hover:text-red-500 hover:bg-red-500/10 transition-colors"
+        (click)="openDeleteAllModal($event)" title="Delete all configuration history">
+        <i class="material-icons text-[18px]">delete_sweep</i>
+      </button>
+
+      <button
+        class="w-8 h-8 rounded-lg hover:bg-bg-hover flex items-center justify-center text-text-muted hover:text-text-main transition-colors mx-auto"
+        (click)="togglePanel()" title="Toggle History Panel">
+        <i class="material-icons text-xl transition-transform duration-300" [class.rotate-180]="isCollapsed">
+          chevron_right
+        </i>
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="flex-1 flex items-center justify-center p-4">
+    <div class="text-sm text-text-muted">Loading history...</div>
+  </div>
+
+  <div *ngIf="!isLoading && errorMessage" class="flex-1 p-4">
+    <div
+      class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 text-red-700 dark:text-red-300 text-sm">
+      {{ errorMessage }}
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && !errorMessage" class="flex-1 relative overflow-hidden">
+    <!-- COLLAPSED VIEW -->
+    <div
+      class="absolute inset-0 overflow-y-auto flex flex-col items-center py-4 gap-4 no-scrollbar transition-all duration-300"
+      [class.opacity-100]="isCollapsed" [class.opacity-0]="!isCollapsed" [class.pointer-events-none]="!isCollapsed">
+      <div *ngFor="let config of configurations; let i = index" class="relative group">
+        <button
+          class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 shadow-sm border border-transparent"
+          [ngClass]="
+          selectedConfigId === config.config_id
+            ? 'bg-primary/20 text-primary border-primary/30'
+            : 'bg-bg-hover text-text-muted hover:bg-primary/10 hover:border-primary/20 hover:text-primary'
+        " (click)="selectConfiguration(config, $event)">
+          <i class="material-icons text-[20px]">
+            {{ selectedConfigId === config.config_id ? 'check_circle' : 'tune' }}
+          </i>
+        </button>
+
+        <div
+          class="absolute left-full ml-3 top-1/2 -translate-y-1/2 bg-gray-800 text-gray-100 text-xs font-medium py-1.5 px-3 rounded-md whitespace-nowrap z-50 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-lg">
+          {{ getDisplayName(config, i) }}
+          <div class="absolute top-1/2 -translate-y-1/2 -left-1 w-2 h-2 bg-gray-800 rotate-45"></div>
+        </div>
+      </div>
+
+      <div *ngIf="!isCollapsed && configurations.length === 0"
+        class="h-full w-full flex flex-col items-center justify-center text-center p-8 opacity-60">
+        <div
+          class="w-16 h-16 rounded-2xl bg-bg-hover border border-border-color border-dashed flex items-center justify-center mb-4">
+          <i class="material-icons text-3xl text-text-muted">history_toggle_off</i>
+        </div>
+        <h4 class="font-medium text-text-main text-sm mb-1">No Configuration History Yet</h4>
+        <p class="text-xs text-text-muted leading-relaxed max-w-[200px]">
+          Saved configurations for this file will appear here.
+        </p>
+      </div>
+    </div>
+
+    <!-- EXPANDED VIEW -->
+    <div class="absolute inset-0 overflow-y-auto p-4 space-y-4 custom-scrollbar transition-all duration-300"
+      [class.opacity-100]="!isCollapsed" [class.opacity-0]="isCollapsed" [class.pointer-events-none]="isCollapsed">
+      <div *ngFor="let config of configurations; let i = index"
+        class="group rounded-xl border transition-all duration-200 overflow-hidden shadow-sm" [ngClass]="
+        selectedConfigId === config.config_id
+          ? 'border-primary bg-primary/5'
+          : 'border-border-color hover:border-primary/50 hover:bg-bg-hover bg-bg-card'
+      ">
+        <div class="p-3 flex items-start gap-3 cursor-pointer" (click)="toggleConfigExpand(config.config_id, $event)">
+          <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 transition-colors" [ngClass]="
+            selectedConfigId === config.config_id
+              ? 'bg-primary/20 text-primary'
+              : 'bg-bg-hover text-text-muted group-hover:text-primary/70'
+          ">
+            <i class="material-icons">tune</i>
+          </div>
+
+          <div class="flex-1 min-w-0 pt-0.5">
+            <h4 class="font-medium text-sm text-text-main truncate">
+              {{ getDisplayName(config, i) }}
+            </h4>
+
+            <div class="flex items-center gap-2 text-[11px] text-text-muted mt-1">
+              <span>{{ formatDate(config.last_opened_at) }}</span>
+              <span class="w-1 h-1 rounded-full bg-text-muted/40"></span>
+              <span>{{ getSubjectsCount(config) }} Subjects</span>
+            </div>
+          </div>
+
+          <div class="flex flex-col items-center gap-1 shrink-0">
+            <button
+              class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-text-muted hover:text-text-main transition-colors">
+              <i class="material-icons text-lg transition-transform duration-300"
+                [class.-rotate-180]="expandedConfigId === config.config_id">
+                expand_more
+              </i>
+            </button>
+
+            <button
+              class="w-6 h-6 flex items-center justify-center rounded hover:bg-red-500/10 text-text-muted hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+              (click)="openDeleteConfigModal(config, $event)" title="Delete this configuration">
+              <i class="material-icons text-[15px]">delete</i>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid transition-all duration-300 ease-in-out"
+          [class.grid-rows-[1fr]]="expandedConfigId === config.config_id.toString()"
+          [class.grid-rows-[0fr]]="expandedConfigId !== config.config_id.toString()">
+          <div class="overflow-hidden">
+            <div class="px-3 pb-3 pt-1 border-t border-border-color/50 mx-3 mt-1 space-y-3">
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div class="bg-bg-card p-2 rounded-md border border-border-color/50">
+                  <span class="text-text-muted block mb-1">Subjects</span>
+                  <span class="text-text-main font-medium">{{ getSubjectsCount(config) }}</span>
+                </div>
+
+                <div class="bg-bg-card p-2 rounded-md border border-border-color/50">
+                  <span class="text-text-muted block mb-1">{{ getItemLabel(config) }}</span>
+                  <span class="text-text-main font-medium">{{ getSessionsCount(config) }}</span>
+                </div>
+
+                <div class="bg-bg-card p-2 rounded-md border border-border-color/50">
+                  <span class="text-text-muted block mb-1">Labels</span>
+                  <span class="text-text-main font-medium">{{ getLabelsCount(config) }}</span>
+                </div>
+
+                <div class="bg-bg-card p-2 rounded-md border border-border-color/50">
+                  <span class="text-text-muted block mb-1">Channels</span>
+                  <span class="text-text-main font-medium">{{ getChannelsCount(config) }}</span>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-2 bg-bg-card p-2 rounded-md border border-border-color/50">
+                <i class="material-icons text-[14px] text-text-muted mt-0.5">account_tree</i>
+                <span class="text-xs text-text-muted break-all font-mono leading-relaxed">
+                  {{ config.configuration_json.montage || 'standard_1020' }}
+                </span>
+              </div>
+
+              <div class="grid grid-cols-[1fr_auto] gap-2">
+                <button
+                  class="py-2 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all duration-200"
+                  [ngClass]="
+                  selectedConfigId === config.config_id.toString()
+                    ? 'bg-primary text-white shadow-md shadow-primary/20'
+                    : 'bg-primary/10 text-primary hover:bg-primary hover:text-white'
+                " (click)="selectConfiguration(config, $event)">
+                  <i class="material-icons text-sm">
+                    {{
+                    selectedConfigId === config.config_id.toString()
+                    ? 'check_circle'
+                    : 'settings_backup_restore'
+                    }}
+                  </i>
+                  {{
+                  selectedConfigId === config.config_id.toString()
+                  ? 'Configuration Selected'
+                  : 'Restore Configuration'
+                  }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="configurations.length === 0"
+        class="h-full flex flex-col items-center justify-center text-center p-8 opacity-60">
+        <div
+          class="w-16 h-16 rounded-2xl bg-bg-hover border border-border-color border-dashed flex items-center justify-center mb-4">
+          <i class="material-icons text-3xl text-text-muted">history_toggle_off</i>
+        </div>
+        <h4 class="font-medium text-text-main text-sm mb-1">No Configuration History Yet</h4>
+        <p class="text-xs text-text-muted leading-relaxed max-w-[200px]">
+          Saved configurations for this file will appear here.
+        </p>
+      </div>
+    </div>
+  </div>
+
+</aside>
+
+<!-- Confirm: single delete -->
+<div *ngIf="configToDelete">
+  <app-confirm-dialog [isOpen]="showDeleteConfirmForConfig" heading="Delete Configuration?"
+    message="Are you sure you want to delete this configuration?" secondaryMessage="This will delete its Pipelines."
+    confirmLabel="Delete" [isLoading]="isDeleting" (confirmed)="confirmDeleteConfig()"
+    (cancelled)="showDeleteConfirmForConfig = false" />
+</div>
+
+<!-- Confirm: delete all -->
+<app-confirm-dialog [isOpen]="showDeleteAllConfirm" heading="Delete All Configurations?"
+  message="Are you sure you want to delete all configurations?"
+  secondaryMessage="This will permanently delete all configuration history for this file. This action cannot be undone."
+  confirmLabel="Delete" [isLoading]="isDeletingAll" (confirmed)="confirmDeleteAllConfigurations()"
+  (cancelled)="showDeleteAllConfirm = false" />

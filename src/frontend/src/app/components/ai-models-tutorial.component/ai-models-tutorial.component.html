@@ -1,0 +1,150 @@
+<!-- Layer 1: dim -->
+<div class="fixed inset-0 z-[9999] bg-black/60 pointer-events-none"></div>
+
+<!-- Layer 2: highlight ring -->
+<div *ngIf="highlightRect" class="fixed pointer-events-none z-[10002] rounded-xl" style="
+    border: 2px solid #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.2), 0 0 20px 4px rgba(59,130,246,0.15);
+    transition: top 0.3s ease, left 0.3s ease, width 0.3s ease, height 0.3s ease;
+  " [style.top.px]="highlightRect.top" [style.left.px]="highlightRect.left" [style.width.px]="highlightRect.width"
+  [style.height.px]="highlightRect.height">
+</div>
+
+<!-- Layer 3: SVG line — z-[10004] so it renders ABOVE the ghost bar -->
+<svg *ngIf="lineCoords" class="fixed inset-0 pointer-events-none z-[10004]"
+  style="width: 100vw; height: 100vh; overflow: visible;" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="ai-tip" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 10 4, 0 8" fill="rgba(255,255,255,0.85)" />
+    </marker>
+  </defs>
+
+  <!-- Dashed bezier curve — arrowhead at x2,y2 (the target) -->
+  <path [attr.d]="lineCoords.d" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-dasharray="6,4" fill="none"
+    marker-end="url(#ai-tip)" />
+
+  <!-- Blue dot at x1,y1 (the card — where the explanation comes from) -->
+  <circle [attr.cx]="lineCoords.x1" [attr.cy]="lineCoords.y1" r="5" fill="#3b82f6" stroke="rgba(255,255,255,0.8)"
+    stroke-width="1.5" />
+</svg>
+
+<!-- Ghost bottom bar — exact copy of the real bar, pointer-events-none -->
+<div *ngIf="showGhostBar" class="fixed bottom-0 left-0 right-0 z-[10001] pointer-events-none
+         bg-bg-card border-t border-border-color
+         shadow-[0_-4px_24px_rgba(0,0,0,0.08)]
+         p-4 md:p-5 animate-in slide-in-from-bottom-4 duration-300">
+  <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+
+    <!-- Left: model info -->
+    <div class="flex items-center gap-4">
+      <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+        <i class="material-icons">model_training</i>
+      </div>
+      <div>
+        <p class="text-xs font-bold text-text-muted uppercase tracking-wider">Ready to Run</p>
+        <p class="text-lg font-bold text-text-main">Example Model</p>
+      </div>
+    </div>
+
+    <!-- Map Labels button (same as real bar) -->
+    <div data-ai-tutorial="ghost-maplabels" class="flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-semibold
+             border-border-color text-text-muted bg-bg-hover select-none cursor-default
+             min-w-[140px] justify-center">
+      <i class="material-icons text-base">compare_arrows</i>
+      Map Labels
+    </div>
+
+    <!-- Right: auto-preprocess + run -->
+    <div class="flex flex-col sm:flex-row items-center gap-5 w-full sm:w-auto">
+
+      <!-- Auto-Preprocess toggle — static "on" for demo -->
+      <label data-ai-tutorial="ghost-autopreprocess" class="flex items-center gap-3 select-none">
+        <div class="flex flex-col text-right">
+          <span class="text-sm font-bold text-text-main">Auto-Preprocess</span>
+          <span class="text-[10px] text-text-muted">Apply model's required filters</span>
+        </div>
+        <div class="relative flex-shrink-0">
+          <div class="block w-11 h-6 rounded-full bg-primary"></div>
+          <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full shadow-sm translate-x-5"></div>
+        </div>
+      </label>
+
+      <div class="w-px h-8 bg-border-color hidden sm:block"></div>
+
+      <div class="flex gap-3 w-full sm:w-auto">
+        <div class="btn-secondary opacity-50 cursor-default select-none pointer-events-none">Cancel</div>
+        <div data-ai-tutorial="ghost-runbtn" class="btn-primary bg-gradient-to-r from-primary to-purple-600
+                 flex items-center gap-2 shadow-lg cursor-default select-none pointer-events-none">
+          <i class="material-icons">auto_awesome</i> Run Prediction
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Layer 5: backdrop -->
+<div class="ai-tutorial-backdrop fixed inset-0 z-[10000]" (click)="onBackdropClick($event)">
+</div>
+
+<!-- Close button -->
+<button class="fixed top-4 right-4 z-[10005] w-9 h-9 rounded-full flex items-center justify-center
+         bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-colors" (click)="close()">
+  <i class="material-icons text-lg">close</i>
+</button>
+
+<!-- Card — slides left on step 2, lifts when ghost bar shows -->
+<div class="fixed z-[10003] inset-0 flex items-center pointer-events-none" [class.justify-center]="!cardLeft"
+  [class.justify-start]="cardLeft" [class.pl-12]="cardLeft">
+
+  <div class="ai-tutorial-card relative w-[460px] min-h-[360px] bg-bg-card border border-border-color
+           rounded-2xl shadow-2xl text-center mx-4 flex flex-col overflow-hidden
+           pointer-events-auto transition-all duration-300 ease-out" [class.-translate-y-20]="showGhostBar"
+    (click)="$event.stopPropagation()">
+
+    <div class="h-1 w-full bg-gradient-to-r from-primary via-purple-500 to-primary flex-none"></div>
+
+    <div class="flex flex-col flex-1 px-8 pb-7 pt-7">
+
+      <div class="flex items-center justify-center gap-3 mb-5">
+        <div class="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20
+                    flex items-center justify-center">
+          <i class="material-icons text-3xl text-primary">{{ step.icon }}</i>
+        </div>
+        <span *ngIf="step.badge" class="px-2.5 py-1 rounded-full text-[11px] font-bold border
+                     bg-amber-500/10 border-amber-500/25 text-amber-400">
+          {{ step.badge }}
+        </span>
+      </div>
+
+      <h3 class="text-xl font-bold text-text-main mb-3">{{ step.title }}</h3>
+      <p class="text-text-muted text-sm leading-relaxed">{{ step.description }}</p>
+
+      <div class="flex-1"></div>
+
+      <div class="flex items-center justify-center gap-2 mt-6">
+        <button *ngFor="let s of steps; let i = index"
+          class="h-2 rounded-full transition-all duration-300 cursor-pointer" [class.w-6]="i === currentStep"
+          [class.w-2]="i !== currentStep" [class.bg-primary]="i === currentStep"
+          [class.bg-border-color]="i !== currentStep" (click)="goTo(i)">
+        </button>
+      </div>
+
+      <p class="text-xs text-text-muted mt-2 mb-5">
+        Step {{ currentStep + 1 }} of {{ steps.length }}
+      </p>
+
+      <div class="flex gap-3">
+        <button *ngIf="!isFirst" class="btn-secondary flex-none" (click)="prev()">
+          <i class="material-icons text-base">arrow_back</i>
+        </button>
+        <button *ngIf="isFirst" class="btn-secondary flex-none text-sm px-5" (click)="close()">
+          Skip
+        </button>
+        <button class="btn-primary flex-1 justify-center py-2.5" (click)="next()">
+          {{ isLast ? 'Got it' : 'Next' }}
+          <i class="material-icons text-base">{{ isLast ? 'check' : 'arrow_forward' }}</i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

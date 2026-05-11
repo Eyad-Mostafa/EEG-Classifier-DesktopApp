@@ -1,0 +1,159 @@
+<aside
+  class="h-full bg-bg-card border-l border-border-color transition-all duration-300 ease-in-out flex flex-col relative"
+  [class.w-80]="!isCollapsed" [class.w-16]="isCollapsed">
+  <div class="h-14 shrink-0 flex items-center justify-between px-4 border-b border-border-color">
+    <div class="flex items-center gap-2 overflow-hidden transition-opacity duration-200" [class.opacity-0]="isCollapsed"
+      [class.w-0]="isCollapsed">
+      <i class="material-icons text-primary">history</i>
+      <span class="font-semibold text-text-main whitespace-nowrap tracking-wide">History</span>
+      <span class="text-xs font-medium bg-bg-hover text-text-muted px-2 py-0.5 rounded-full">
+        {{ files.length }}
+      </span>
+    </div>
+
+    <button *ngIf="!isCollapsed && files.length > 0"
+      class="w-8 h-8 rounded-lg hover:bg-red-500/10 flex items-center justify-center text-text-muted hover:text-red-500 transition-colors ml-auto mr-1"
+      (click)="openDeleteAllModal($event)" title="Clear All History">
+      <i class="material-icons text-[18px]">delete_sweep</i>
+    </button>
+
+    <button
+      class="w-8 h-8 rounded-lg hover:bg-bg-hover flex items-center justify-center text-text-muted hover:text-text-main transition-colors"
+      [class.mx-auto]="isCollapsed" (click)="togglePanel()" title="Toggle History Panel">
+      <i class="material-icons text-xl transition-transform duration-300" [class.rotate-180]="isCollapsed">
+        chevron_right
+      </i>
+    </button>
+  </div>
+
+  <div *ngIf="isCollapsed" class="flex-1 overflow-y-auto flex flex-col items-center py-4 gap-4 no-scrollbar">
+    <div *ngFor="let file of files" class="relative group">
+      <button
+        class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 shadow-sm border border-transparent"
+        [ngClass]="
+          selectedFileId === file.file_id
+            ? 'bg-primary/20 text-primary border-primary/30'
+            : 'bg-bg-hover text-text-muted hover:bg-primary/10 hover:border-primary/20 hover:text-primary'
+        " (click)="openPanelAndExpandFile(file.file_id, $event)">
+        <i class="material-icons text-[20px]">
+          {{ selectedFileId === file.file_id ? "check_circle" : "description" }}
+        </i>
+      </button>
+
+      <div
+        class="absolute left-full ml-3 top-1/2 -translate-y-1/2 bg-gray-800 text-gray-100 text-xs font-medium py-1.5 px-3 rounded-md whitespace-nowrap z-50 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-lg">
+        {{ file.filename }}
+        <div class="absolute top-1/2 -translate-y-1/2 -left-1 w-2 h-2 bg-gray-800 rotate-45"></div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!isCollapsed" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+    <div *ngFor="let file of files"
+      class="group rounded-xl border transition-all duration-200 overflow-hidden shadow-sm" [ngClass]="
+        selectedFileId === file.file_id
+          ? 'border-primary bg-primary/5'
+          : 'border-border-color hover:border-primary/50 hover:bg-bg-hover bg-bg-card'
+      ">
+      <div class="p-3 flex items-start gap-3 cursor-pointer" (click)="toggleFileExpand(file.file_id, $event)">
+        <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 transition-colors" [ngClass]="
+            selectedFileId === file.file_id
+              ? 'bg-primary/20 text-primary'
+              : 'bg-bg-hover text-text-muted group-hover:text-primary/70'
+          ">
+          <i class="material-icons">insert_drive_file</i>
+        </div>
+
+        <div class="flex-1 min-w-0 pt-0.5">
+          <h4 class="font-medium text-sm text-text-main truncate" [title]="file.filename">
+            {{ file.filename }}
+          </h4>
+          <div class="flex items-center gap-2 text-[11px] text-text-muted mt-1">
+            <span>{{ formatDate(file.last_opened_at) }}</span>
+            <span class="w-1 h-1 rounded-full bg-text-muted/40"></span>
+            <span>{{ file.sampling_rate }} Hz</span>
+          </div>
+        </div>
+
+        <div class="flex flex-col items-center gap-1 shrink-0">
+          <button
+            class="w-6 h-6 flex items-center justify-center rounded hover:bg-black/5 dark:hover:bg-white/5 text-text-muted transition-colors mt-1"
+            title="Expand Details">
+            <i class="material-icons text-lg transition-transform duration-300"
+              [class.-rotate-180]="expandedFileId === file.file_id">
+              expand_more
+            </i>
+          </button>
+          <button
+            class="w-6 h-6 flex items-center justify-center rounded hover:bg-red-500/10 text-text-muted hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+            (click)="openDeleteFileModal(file, $event)" title="Delete File">
+            <i class="material-icons text-[15px]">delete</i>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid transition-all duration-300 ease-in-out"
+        [class.grid-rows-[1fr]]="expandedFileId === file.file_id"
+        [class.grid-rows-[0fr]]="expandedFileId !== file.file_id">
+        <div class="overflow-hidden">
+          <div class="px-3 pb-3 pt-1 border-t border-border-color/50 mx-3 mt-1 space-y-3">
+            <div class="flex items-start gap-2 bg-bg-card p-2 rounded-md border border-border-color/50">
+              <i class="material-icons text-[14px] text-text-muted mt-0.5">folder_open</i>
+              <span class="text-xs text-text-muted break-all font-mono leading-relaxed">
+                {{ file.file_path }}
+              </span>
+            </div>
+
+            <button
+              class="w-full py-2 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all duration-200"
+              [ngClass]="
+                selectedFileId === file.file_id
+                  ? 'bg-primary text-white shadow-md shadow-primary/20'
+                  : 'bg-primary/10 text-primary hover:bg-primary hover:text-white'
+              " (click)="selectFile(file, $event)">
+              <i class="material-icons text-sm">
+                {{
+                selectedFileId === file.file_id
+                ? "arrow_forward"
+                : "play_arrow"
+                }}
+              </i>
+              {{
+              selectedFileId === file.file_id
+              ? "Continue to configuration.."
+              : "Select & Continue"
+              }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="files.length === 0" class="h-full flex flex-col items-center justify-center text-center p-8 opacity-60">
+      <div
+        class="w-16 h-16 rounded-2xl bg-bg-hover border border-border-color border-dashed flex items-center justify-center mb-4">
+        <i class="material-icons text-3xl text-text-muted">history_toggle_off</i>
+      </div>
+      <h4 class="font-medium text-text-main text-sm mb-1">No History Yet</h4>
+      <p class="text-xs text-text-muted leading-relaxed max-w-[200px]">
+        Files you process will automatically appear here.
+      </p>
+    </div>
+  </div>
+</aside>
+
+<!-- Confirm: single delete -->
+<div *ngIf="fileToDelete">
+  <app-confirm-dialog [isOpen]="showDeleteConfirmForFile" heading="Delete File?" [message]="
+      'Are you sure you want to remove ' +
+      fileToDelete.filename +
+      ' from history?'
+    " secondaryMessage="This will delete its configurations and Pipelines." confirmLabel="Delete"
+    [isLoading]="isDeletingHistory" (confirmed)="executeDeleteFile()" (cancelled)="showDeleteConfirmForFile = false" />
+</div>
+
+<!-- Confirm: delete all -->
+<app-confirm-dialog [isOpen]="showDeleteConfirmAllhistory" heading="Clear all file history?" message="This action will permanently wipe your files history. All configured files, their file-specific preprocessing histories, Their saved
+      Analysis and visualizations will be lost." secondaryMessage="Are you absolutely sure you want to proceed?"
+  confirmLabel="Delete all files" [isLoading]="isDeletingHistory" (confirmed)="executeDeleteHistory()"
+  (cancelled)="showDeleteConfirmAllhistory = false" />

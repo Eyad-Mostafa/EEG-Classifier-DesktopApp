@@ -1,0 +1,84 @@
+<header
+  class="bg-bg-card border-b border-border-color h-14 flex items-center justify-between px-4 sticky top-0 z-50 transition-colors duration-300">
+
+  <!-- Logo -->
+  <div class="flex items-center gap-3 cursor-pointer group" (click)="goToUpload()">
+    <h1 class="text-lg font-bold text-text-main tracking-tight group-hover:text-primary transition-colors">
+      EEG<span class="text-primary">Classifier</span>
+    </h1>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="hidden md:flex items-center gap-1">
+
+    <div *ngFor="let item of navItems" class="relative">
+
+      <div *ngIf="!item.children" [attr.data-nav]="item.dataNav" (click)="goTo(item, $event)"
+        class="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 select-none"
+        [ngClass]="{
+    'text-text-main hover:text-primary hover:bg-bg-hover cursor-pointer': !item.disabled && currentRoute !== item.path,
+    'bg-primary/10 text-primary cursor-default': currentRoute === item.path && !item.disabled,
+    'opacity-40 cursor-not-allowed text-text-muted': item.disabled
+  }">
+        <i class="material-icons text-[18px]">{{ item.icon }}</i>
+        <span>{{ item.label }}</span>
+      </div>
+
+      <div *ngIf="item.children" [attr.data-nav]="item.dataNav" (click)="toggleDropdown(item, $event)"
+        class="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 select-none cursor-pointer"
+        [ngClass]="{
+    'opacity-50 text-text-muted hover:bg-bg-hover': isParentDisabled(item),
+    'bg-primary/10 text-primary': !isParentDisabled(item) && (currentRoute === '/preprocess' || currentRoute === '/results' || item.isOpen),
+    'text-text-main hover:text-primary hover:bg-bg-hover': !isParentDisabled(item) && !item.isOpen && currentRoute !== '/preprocess' && currentRoute !== '/results'
+  }">
+        <i class="material-icons text-[18px]">{{ item.icon }}</i>
+        <span>{{ item.label }}</span>
+        <i class="material-icons text-[16px] opacity-60 transition-transform duration-200"
+          [ngClass]="{'rotate-180': item.isOpen}">expand_more</i>
+      </div>
+
+      <div *ngIf="item.children && item.isOpen" (click)="$event.stopPropagation()"
+        class="absolute left-0 top-full mt-2 flex flex-col bg-bg-card border border-border-color rounded-md shadow-lg min-w-[160px] z-50 animate-in slide-in-from-top-2 duration-200">
+
+        <div *ngFor="let child of item.children" (click)="goTo(child, $event)"
+          class="flex items-center justify-between gap-2 px-3 py-2 text-sm transition-all duration-200" [ngClass]="{
+            'cursor-pointer hover:bg-bg-hover hover:text-primary': !child.disabled,
+            'opacity-40 cursor-not-allowed text-text-muted': child.disabled,
+            'bg-primary/10 text-primary': currentRoute === child.path && !child.disabled
+          }">
+          <span>{{ child.label }}</span>
+        </div>
+
+      </div>
+
+    </div>
+
+  </nav>
+
+  <!-- Right Side Buttons -->
+  <div class="flex items-center gap-2">
+
+    <button (click)="toggleDarkMode()"
+      class="p-2 rounded-full text-text-muted hover:bg-bg-hover hover:text-primary transition-all duration-200 focus:outline-none"
+      title="Toggle Dark Mode">
+
+      <i class="material-icons text-[20px]">
+        {{ isDarkMode ? 'light_mode' : 'dark_mode' }}
+      </i>
+
+    </button>
+
+    <div class="h-6 w-px bg-border-color mx-2"></div>
+
+    <button (click)="goToSettings()" class="p-2 rounded-full transition-all duration-200 focus:outline-none" [ngClass]="{
+        'bg-primary/10 text-primary': currentRoute === '/settings',
+        'text-text-muted hover:bg-bg-hover hover:text-primary': currentRoute !== '/settings'
+      }" title="Settings">
+
+      <i class="material-icons text-[20px]">settings_suggest</i>
+
+    </button>
+
+  </div>
+
+</header>

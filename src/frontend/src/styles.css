@@ -1,0 +1,304 @@
+/* 1. Import Fonts */
+/* We keep DM Sans, but we will stack it with system fonts for speed */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
+/* 2. Tailwind Directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 3. Design Tokens (The Variables) */
+:root {
+  /* --- Light Mode (Professional Desktop Theme) --- */
+  
+  /* Brand Colors - A cleaner, sharper Blue */
+  --primary: #3b82f6;        /* Blue-500: Standard, high-contrast blue */
+  --primary-hover: #2563eb;  /* Blue-600: Deep interaction state */
+  --accent: #10b981;         /* Emerald-500: Success/Active states */
+  
+  /* Backgrounds - Using "Slate" scale for a premium app feel */
+  --bg-main: #f8fafc;        /* Slate-50: Crisp, clean app background */
+  --bg-card: #ffffff;        /* White: Pure surface */
+  --bg-hover: #f1f5f9;       /* Slate-100: Subtle hover highlight */
+  
+  /* Text - High contrast for readability */
+  --text-main: #0f172a;      /* Slate-900: Almost black, very sharp */
+  --text-muted: #64748b;     /* Slate-500: Perfect for labels/hints */
+  --text-inverted: #ffffff;  /* Text on primary buttons */
+  
+  /* Borders - Structural but not heavy */
+  --border-color: #e2e8f0;   /* Slate-200: Defines structure without noise */
+  
+  /* Loader - Light Mode */
+  --loader-bg: #f8fafc;
+  --loader-color: #3b82f6;
+}
+
+/* --- Dark Mode (The "IDE" Look) --- */
+.dark {
+  /* Brand Colors - Slightly desaturated for eye comfort */
+  --primary: #60a5fa;        /* Blue-400: Glowing blue for dark mode */
+  --primary-hover: #3b82f6;  /* Blue-500 */
+  --accent: #34d399;         /* Emerald-400 */
+  
+  /* Backgrounds - Deep, rich blue-blacks */
+  --bg-main: #0f172a;        /* Slate-900: Main window background */
+  --bg-card: #1e293b;        /* Slate-800: Card/Panel background */
+  --bg-hover: #334155;       /* Slate-700: Hover state */
+  
+  /* Text */
+  --text-main: #f8fafc;      /* Slate-50: Bright white-ish text */
+  --text-muted: #94a3b8;     /* Slate-400: Softer secondary text */
+  --text-inverted: #0f172a;  /* Text on primary buttons */
+  
+  /* Borders */
+  --border-color: #334155;   /* Slate-700: Low contrast borders */
+  
+  /* Loader - Dark Mode */
+  --loader-bg: #1e293b;
+  --loader-color: #3b82f6;
+}
+
+html {
+  font-size: 13px; 
+}
+
+/* 4. Global Electron/Desktop Resets */
+body {
+  /* Use the System Font Stack for native feel */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  
+  @apply bg-bg-main text-text-main h-screen w-screen overflow-hidden;
+  /* overflow-hidden on body keeps the "Window" fixed. */
+}
+
+::-webkit-scrollbar {
+  width: 8px; /* Thinner */
+  height: 8px;
+}
+
+/* Allow text selection in inputs and paragraphs where needed */
+input, textarea, p, code, pre {
+  @apply select-text;
+}
+
+/* 5. Custom Scrollbar (Windows 11 / macOS Style) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; 
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-slate-600;
+  border-radius: 9999px;
+  border: 3px solid transparent; /* Creates the "floating" padding effect */
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-slate-500;
+}
+
+/* 6. Component Layer (The "LEGO Blocks") */
+@layer components {
+  
+  /* --- Buttons --- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-bg-main shadow-sm;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary hover:bg-primary-hover text-text-inverted focus:ring-primary;
+  }
+
+  .btn-secondary {
+    @apply btn bg-bg-card text-text-main border border-border-color hover:bg-bg-hover hover:border-gray-300 dark:hover:border-slate-600 focus:ring-gray-400;
+  }
+
+  /* --- Cards --- */
+  /* Added 'backdrop-blur' for that modern OS feel if you use semi-transparent colors later */
+  .app-card {
+    @apply bg-bg-card border border-border-color rounded-xl shadow-sm p-6 transition-all duration-200 backdrop-blur-sm;
+  }
+  
+  /* Hover effect for interactive cards (like File Upload drop zone) */
+  .app-card-interactive {
+    @apply app-card hover:shadow-md hover:border-primary/50 cursor-pointer;
+  }
+
+  /* --- Inputs --- */
+  .app-input {
+    /* REMOVED the opacity slash (/50) to fix your build error */
+    @apply w-full px-4 py-2.5 rounded-lg bg-bg-card border border-border-color text-text-main placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 shadow-sm;
+  }
+
+  .app-label {
+    @apply block text-sm font-semibold text-text-muted mb-1.5 ml-0.5;
+  }
+  
+  /* --- Status Badges --- */
+  .status-badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border;
+  }
+  
+  .status-success {
+    @apply bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800;
+  }
+  
+  .status-running {
+    @apply bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800 animate-pulse;
+  }
+  
+  .status-pending {
+    @apply bg-gray-50 text-gray-600 border-gray-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700;
+  }
+}
+
+img {
+  /* Prevents the browser from trying to be "helpful" with smoothing */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* While onboarding is shown, all nav items appear fully enabled */
+header.onboarding-active nav .opacity-40,
+header.onboarding-active nav .opacity-50 {
+  opacity: 1 !important;
+  cursor: default !important;
+  pointer-events: none;
+}
+
+/* ========================================= */
+/* DRAG & DROP: GLITCH-FREE PHYSICS       */
+/* ========================================= */
+
+/* 1. THE LIST ITEMS (While Dragging) */
+/* This handles the siblings moving out of the way */
+.cdk-drop-list-dragging .cdk-drag {
+  /* CRITICAL FIX: 
+     We restrict transition-property to ONLY 'transform'.
+     This prevents Tailwind's 'transition-all' from trying to animate 
+     backgrounds/shadows while the card is moving, which causes the glitch.
+  */
+  transition-property: transform !important;
+  transition-duration: 250ms !important;
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1) !important;
+  
+  /* Keep items readable while shuffling */
+  z-index: 1; 
+}
+
+/* 2. THE SNAP (When you release the mouse) */
+/* This handles the card settling into its new spot */
+.cdk-drag-animating {
+  transition-property: transform !important;
+  transition-duration: 200ms !important;
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1) !important;
+  
+  /* Z-INDEX FIX for UPWARD DRAG: 
+     When dragging up, the item usually clips behind the one above it.
+     We force it to z-index 50 so it floats *over* its neighbors while snapping.
+  */
+  z-index: 50 !important; 
+}
+
+/* 3. THE PREVIEW (The card you are holding) */
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 12px;
+  
+  /* Visuals: Lifted look */
+  background-color: var(--bg-card);
+  border: 2px solid var(--primary);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  
+  opacity: 0.95;
+  z-index: 9999 !important;
+  
+  /* Cursor: Force grabbing so it doesn't disappear */
+  cursor: grabbing !important;
+  cursor: -webkit-grabbing !important;
+  
+  /* Performance: Disable transitions on the held item to prevent lag */
+  transition: none !important;
+}
+
+/* 4. THE PLACEHOLDER (The gap where it lands) */
+.cdk-drag-placeholder {
+  opacity: 0.3;
+  background: var(--bg-hover);
+  border: 2px dashed var(--border-color);
+  border-radius: 12px;
+  min-height: 60px;
+  
+  /* Ensure the gap opens smoothly */
+  transition: transform 250ms cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+/* 5. GLOBAL CURSOR FIX */
+body.cdk-global-scrollblock {
+  cursor: grabbing !important;
+  cursor: -webkit-grabbing !important;
+  overflow: hidden !important; 
+}
+
+/* 5. The Preview (The actual card you are holding) */
+.cdk-drag-preview {
+  /* Box Sizing is critical so borders don't break dimensions */
+  box-sizing: border-box;
+  border-radius: 12px;
+  
+  /* HIGH ELEVATION: Show that it is lifted "above" the other cards */
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  
+  /* BORDER: Highlight it with your primary color so the user knows they gripped it */
+  border: 2px solid var(--primary);
+  background-color: var(--bg-card); /* Keep it solid, don't let text bleed through */
+  
+  /* OPACITY: Slight transparency is okay, but keep it high (0.95) for readability */
+  opacity: 0.95;
+  
+  /* CURSOR: Critical for UX - Force the "Grabbing" hand */
+  cursor: grabbing !important;
+  cursor: -webkit-grabbing !important;
+  
+  /* Optimization: Prevents the preview from capturing mouse events, 
+     allowing the drop list below to detect hover correctly */
+  pointer-events: none;
+  
+  /* Ensure it sits on top of everything */
+  z-index: 9999 !important;
+}
+
+/* 1. WHILE DRAGGING (The Physics) */
+.cdk-drop-list-dragging .cdk-drag {
+  transition: transform 400ms cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 1000; /* Keep it above everything */
+}
+
+/* 2. THE DROP (The "Settling" Animation) - FIX HERE */
+/* We add !important to ensure this timing takes over when you release the mouse */
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  z-index: 1000; /* Keep it high while settling */
+}
+
+/* 3. LIST OPTIMIZATION (Prevents the list from jittering while items move) */
+.cdk-drop-list-dragging {
+  /* Hardware acceleration for the whole list */
+  transform: translate3d(0, 0, 0); 
+}
+
+
+@layer base {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}

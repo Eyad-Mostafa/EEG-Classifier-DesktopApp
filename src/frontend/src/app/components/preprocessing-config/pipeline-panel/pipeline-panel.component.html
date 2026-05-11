@@ -1,0 +1,221 @@
+<div class="fixed inset-0 z-50 flex justify-end overflow-hidden">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/30 backdrop-blur-[2px]" (click)="onClose()"></div>
+
+    <!-- Panel -->
+    <div
+        class="relative h-full w-full max-w-md bg-bg-card shadow-2xl animate-in slide-in-from-right duration-300 flex flex-col">
+
+        <!-- Header -->
+        <div class="flex-none px-6 py-4 border-b border-border-color flex items-center justify-between">
+            <h2 class="text-lg font-bold text-text-main">Saved Pipelines</h2>
+            <button class="p-2 hover:bg-bg-hover rounded-full transition-colors" (click)="onClose()">
+                <i class="material-icons">close</i>
+            </button>
+        </div>
+
+        <!-- Tabs with Global Delete Buttons -->
+        <div class="flex-none flex border-b border-border-color items-center justify-between">
+            <div class="flex">
+                <button class="flex-1 px-4 py-3 text-sm font-medium transition-colors relative"
+                    [class.text-primary]="activeTab === 'global'" [class.text-text-muted]="activeTab !== 'global'"
+                    (click)="activeTab = 'global'; loadPipelines()">
+                    Global Pipelines
+                    <span *ngIf="activeTab === 'global'"
+                        class="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>
+                </button>
+                <button class="flex-1 px-4 py-3 text-sm font-medium transition-colors relative disabled:opacity-50"
+                    [class.text-primary]="activeTab === 'file-specific'"
+                    [class.text-text-muted]="activeTab !== 'file-specific'" [disabled]="!currentConfigId"
+                    (click)="activeTab = 'file-specific'; loadPipelines()">
+                    File-Specific
+                    <span *ngIf="activeTab === 'file-specific'"
+                        class="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>
+                </button>
+            </div>
+
+            <!-- Global Delete Buttons -->
+            <div class="flex gap-2 px-4">
+                <!-- Global Delete Button (shows only on Global tab) -->
+                <button *ngIf="activeTab === 'global' && globalPipelines.length > 0"
+                    class="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors flex items-center gap-1"
+                    (click)="onDeleteAllGlobalPipelines($event)" title="Delete All Global Pipelines">
+                    <i class="material-icons text-lg">delete_sweep</i>
+                    <span class="text-xs font-medium hidden sm:inline">Delete All</span>
+                </button>
+
+                <!-- File-Specific Delete Button (shows only on File-Specific tab) -->
+                <button *ngIf="activeTab === 'file-specific' && fileSpecificPipelines.length > 0"
+                    class="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors flex items-center gap-1"
+                    (click)="onDeleteAllFileSpecificPipelines($event)" title="Delete All File-Specific Pipelines">
+                    <i class="material-icons text-lg">delete_sweep</i>
+                    <span class="text-xs font-medium hidden sm:inline">Delete All</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="flex-1 flex items-center justify-center">
+            <div class="text-center">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                <p class="text-text-muted">Loading pipelines...</p>
+            </div>
+        </div>
+
+        <!-- Pipeline List -->
+        <div *ngIf="!isLoading" class="flex-1 overflow-y-auto p-4 custom-scrollbar">
+
+            <!-- Global Tab Content -->
+            <div *ngIf="activeTab === 'global'" class="space-y-3">
+                <div *ngIf="globalPipelines.length === 0" class="text-center py-12">
+                    <i class="material-icons text-5xl text-text-muted mb-3">account_tree</i>
+                    <p class="text-text-muted">No global pipelines saved yet</p>
+                    <p class="text-xs text-text-muted/70 mt-1">Save your first pipeline to get started</p>
+                </div>
+
+                <div *ngFor="let pipeline of globalPipelines"
+                    class="border border-border-color rounded-lg hover:border-primary/30 transition-colors cursor-pointer"
+                    [class.border-primary]="expandedPipelineId === pipeline.id">
+
+                    <!-- Pipeline Header -->
+                    <div class="p-4 flex items-start justify-between" (click)="toggleExpand(pipeline.id)">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-medium text-text-main truncate">{{ pipeline.name }}</h3>
+                                <span
+                                    class="px-2 py-0.5 bg-blue-500/10 text-blue-500 text-xs rounded-full">Global</span>
+                            </div>
+                            <div class="flex items-center gap-3 mt-1 text-xs text-text-muted">
+                                <span>{{ formatDate(pipeline.createdAt) }}</span>
+                                <span>•</span>
+                                <span>{{ pipeline.algorithmCount }} algorithms</span>
+                            </div>
+                        </div>
+                        <i class="material-icons text-text-muted transition-transform duration-200"
+                            [class.rotate-180]="expandedPipelineId === pipeline.id">
+                            expand_more
+                        </i>
+                    </div>
+
+                    <!-- Expanded Actions with Notes -->
+                    <div *ngIf="expandedPipelineId === pipeline.id" class="px-4 pb-4 pt-2 border-t border-border-color">
+
+                        <!-- Show notes if they exist -->
+                        <div *ngIf="pipeline.notes" class="mb-3 p-3 bg-bg-hover rounded-lg border border-border-color">
+                            <div class="flex items-center gap-1 mb-1">
+                                <i class="material-icons text-sm text-text-muted">note</i>
+                                <span class="text-xs font-medium text-text-muted">Notes:</span>
+                            </div>
+                            <p class="text-sm text-text-main whitespace-pre-wrap">{{ pipeline.notes }}</p>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="flex gap-2">
+                            <button
+                                class="flex-1 px-3 py-2 bg-primary text-white rounded text-sm font-medium hover:bg-primary-hover transition-colors"
+                                (click)="onLoadPipeline(pipeline.id)">
+                                Load Pipeline
+                            </button>
+                            <button class="p-2 text-red-500 hover:bg-red-500/10 rounded transition-colors"
+                                (click)="onDeletePipeline($event, pipeline.id)">
+                                <i class="material-icons text-lg">delete</i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- File-Specific Tab Content -->
+            <div *ngIf="activeTab === 'file-specific'" class="space-y-3">
+                <div *ngIf="fileSpecificPipelines.length === 0" class="text-center py-12">
+                    <i class="material-icons text-5xl text-text-muted mb-3">insert_drive_file</i>
+                    <p class="text-text-muted">No pipelines saved for this file</p>
+                    <p class="text-xs text-text-muted/70 mt-1">Save a file-specific pipeline to see it here</p>
+                </div>
+
+                <div *ngFor="let pipeline of fileSpecificPipelines"
+                    class="border border-border-color rounded-lg hover:border-primary/30 transition-colors cursor-pointer"
+                    [class.border-primary]="expandedPipelineId === pipeline.id">
+
+                    <!-- Pipeline Header -->
+                    <div class="p-4 flex items-start justify-between" (click)="toggleExpand(pipeline.id)">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-medium text-text-main truncate">{{ pipeline.name }}</h3>
+                                <span
+                                    class="px-2 py-0.5 bg-green-500/10 text-green-500 text-xs rounded-full">File</span>
+                            </div>
+                            <div class="flex items-center gap-3 mt-1 text-xs text-text-muted">
+                                <span>{{ formatDate(pipeline.createdAt) }}</span>
+                                <span>•</span>
+                                <span>{{ pipeline.algorithmCount }} algorithms</span>
+                            </div>
+                            <p class="text-xs text-text-muted/70 mt-1 truncate">{{ pipeline.fileName }}</p>
+                        </div>
+                        <i class="material-icons text-text-muted transition-transform duration-200"
+                            [class.rotate-180]="expandedPipelineId === pipeline.id">
+                            expand_more
+                        </i>
+                    </div>
+
+                    <!-- Expanded Actions with Notes -->
+                    <div *ngIf="expandedPipelineId === pipeline.id" class="px-4 pb-4 pt-2 border-t border-border-color">
+
+                        <!-- Show notes if they exist -->
+                        <div *ngIf="pipeline.notes" class="mb-3 p-3 bg-bg-hover rounded-lg border border-border-color">
+                            <div class="flex items-center gap-1 mb-1">
+                                <i class="material-icons text-sm text-text-muted">note</i>
+                                <span class="text-xs font-medium text-text-muted">Notes:</span>
+                            </div>
+                            <p class="text-sm text-text-main whitespace-pre-wrap">{{ pipeline.notes }}</p>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="flex gap-2">
+                            <button
+                                class="flex-1 px-3 py-2 bg-primary text-white rounded text-sm font-medium hover:bg-primary-hover transition-colors"
+                                (click)="onLoadPipeline(pipeline.id)">
+                                Load Pipeline
+                            </button>
+                            <button class="p-2 text-red-500 hover:bg-red-500/10 rounded transition-colors"
+                                (click)="onDeletePipeline($event, pipeline.id)">
+                                <i class="material-icons text-lg">delete</i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex-none p-4 border-t border-border-color text-center">
+            <p class="text-xs text-text-muted">
+                Pipelines are saved to the database
+            </p>
+        </div>
+    </div>
+
+    <!-- Confirm: single delete -->
+    <app-confirm-dialog
+        [isOpen]="showDeletePipelineConfirm"
+        heading="Delete Pipeline"
+        message="Are you sure you want to delete this pipeline?"
+        secondaryMessage="This action cannot be undone."
+        confirmLabel="Delete"
+        [isLoading]="isDeletingHistory"
+        (confirmed)="confirmDeletePipeline()"
+        (cancelled)="showDeletePipelineConfirm = false; pendingDeletePipelineId = null"
+    />
+
+<!-- Confirm: delete all -->
+    <app-confirm-dialog
+        [isOpen]="showDeleteConfirm"
+        heading="Confirm Delete All"
+        [message]="'Are you sure you want to delete ' + deleteCount + ' ' + (activeTab === 'global' ? 'global' : 'file-specific') + ' pipeline(s)?'"
+        secondaryMessage="This action cannot be undone."
+        confirmLabel="Delete"
+        [isLoading]="isDeletingHistory"
+        (confirmed)="confirmDeleteAll()"
+        (cancelled)="showDeleteConfirm = false"
+    />
+</div>

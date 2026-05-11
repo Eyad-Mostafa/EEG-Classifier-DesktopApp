@@ -1,0 +1,104 @@
+<div class="h-full flex flex-col bg-bg-card text-text-main shadow-2xl border-l border-border-color w-full max-w-md">
+
+  <div class="flex-none px-6 py-5 border-b border-border-color bg-bg-card flex justify-between items-start z-10">
+    <div *ngIf="fullAlgorithmDetails">
+      <div class="flex items-center gap-2 mb-2">
+        <span
+          class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-text-muted/10 text-text-muted">
+          {{ fullAlgorithmDetails.type }}
+        </span>
+
+        <span
+          class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary border /20">
+          {{ fullAlgorithmDetails.category }}
+        </span>
+      </div>
+      <h2 class="text-2xl font-bold text-text-main leading-tight">{{ fullAlgorithmDetails.name }}</h2>
+    </div>
+
+    <div *ngIf="isLoading" class="animate-pulse">
+      <div class="h-4 w-20 bg-gray-200 rounded mb-2"></div>
+      <div class="h-8 w-48 bg-gray-200 rounded"></div>
+    </div>
+
+    <button (click)="close.emit()"
+      class="text-text-muted hover:text-text-main p-2 hover:bg-bg-hover rounded-md transition-colors">
+      <i class="material-icons">close</i>
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="fixed inset-0 bg-bg-main/80 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div class="bg-bg-card rounded-2xl shadow-2xl border border-border-color">
+      <app-loader message="Loading Details" subMessage="Loading algorithm details, please wait..."></app-loader>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="flex-1 flex items-center justify-center p-6 text-center text-red-500">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <div *ngIf="!isLoading && fullAlgorithmDetails"
+    class="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar bg-bg-main/30">
+
+    <section>
+      <p class="text-base text-text-muted leading-relaxed border-l-4 border-primary pl-4">
+        {{ fullAlgorithmDetails.description }}
+      </p>
+    </section>
+
+    <section>
+      <button (click)="openManual()"
+        class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-bg-card hover:bg-bg-hover border border-border-color rounded-lg shadow-sm transition-all group">
+        <i class="material-icons text-red-500 group-hover:scale-110 transition-transform">picture_as_pdf</i>
+        <span class="text-sm font-medium text-text-main">Click for more details</span>
+        <i class="material-icons text-text-muted text-sm ml-auto">open_in_new</i>
+      </button>
+    </section>
+    <section *ngIf="fullAlgorithmDetails.howItWorks">
+      <h3 class="text-xs font-bold text-text-main uppercase tracking-wider mb-3 flex items-center gap-2">
+        <i class="material-icons text-base text-primary">lightbulb</i> How It Works
+      </h3>
+      <div
+        class="text-sm text-text-muted leading-7 bg-bg-card p-4 rounded-lg border border-border-color shadow-sm whitespace-pre-line">
+        {{ fullAlgorithmDetails.howItWorks }}
+      </div>
+    </section>
+
+    <section *ngIf="fullAlgorithmDetails.parameters.length">
+      <h3 class="text-xs font-bold text-text-main uppercase tracking-wider mb-3 flex items-center gap-2">
+        <i class="material-icons text-base text-primary">tune</i> Parameters
+      </h3>
+      <div class="grid gap-3">
+        <div *ngFor="let param of fullAlgorithmDetails.parameters"
+          class="bg-bg-card p-3 rounded-lg border border-border-color shadow-sm">
+          <div class="flex justify-between items-center mb-2">
+            <span class="font-bold text-sm text-text-main">{{ param.name }}</span>
+            <code
+              class="text-[10px] bg-bg-hover px-1.5 py-0.5 rounded border border-border-color text-text-muted font-mono uppercase">{{ param.type }}</code>
+          </div>
+          <p class="text-xs text-text-muted leading-relaxed">{{ param.description || 'No description provided.' }}</p>
+          <div class="mt-2 flex gap-2 text-[10px] text-text-muted font-mono" *ngIf="param.default !== undefined">
+            <span
+              class="bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 px-1.5 py-0.5 rounded border border-green-100 dark:border-green-900">
+              Default: {{ param.default }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section *ngIf="fullAlgorithmDetails.useCases?.length">
+      <h3 class="text-xs font-bold text-text-main uppercase tracking-wider mb-3 flex items-center gap-2">
+        <i class="material-icons text-base text-primary">check_circle</i> Use Cases
+      </h3>
+      <ul class="space-y-2">
+        <li *ngFor="let useCase of fullAlgorithmDetails.useCases"
+          class="flex items-start gap-2 text-sm text-text-muted bg-bg-card p-3 rounded-lg border border-border-color">
+          <i class="material-icons text-sm text-green-500 mt-0.5">check</i>
+          <span>{{ useCase }}</span>
+        </li>
+      </ul>
+    </section>
+
+  </div>
+</div>

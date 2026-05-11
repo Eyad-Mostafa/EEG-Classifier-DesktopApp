@@ -1,0 +1,33 @@
+<div class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" (click)="onDecision(false)"></div>
+
+  <div
+    class="relative bg-bg-card w-full max-w-md rounded-xl shadow-2xl p-6 animate-in zoom-in-95 duration-200 border border-border-color">
+
+    <div class="flex items-center gap-4 mb-4">
+      <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+        <i class="material-icons text-2xl">restore</i>
+      </div>
+      <div>
+        <h2 class="text-xl font-bold text-text-main">Apply Latest Configuration?</h2>
+        <p class="text-sm text-text-muted">File: {{ fileName }}</p>
+      </div>
+    </div>
+
+    <p class="text-text-main mb-6 leading-relaxed text-sm">
+      We found a previously saved configuration for this file. Would you like to apply the latest configuration used
+      before?
+    </p>
+
+    <div class="flex flex-col gap-3">
+      <button class="btn-primary w-full flex justify-center items-center gap-2" (click)="onDecision(true)">
+        <i class="material-icons text-sm">auto_fix_high</i>
+        Yes, Apply Latest Configuration
+      </button>
+
+      <button class="btn-secondary w-full" (click)="onDecision(false)">
+        No, Start Fresh
+      </button>
+    </div>
+  </div>
+</div>

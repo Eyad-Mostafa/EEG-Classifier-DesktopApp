@@ -1,0 +1,30 @@
+<div
+  class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+  (click)="close()">
+
+  <div
+    class="relative w-full max-w-lg bg-bg-card border border-border-color rounded-2xl shadow-2xl p-8 text-center animate-in zoom-in-95 duration-200"
+    (click)="$event.stopPropagation()">
+
+    <div class="rounded-xl overflow-hidden border border-border-color shadow-sm mb-6 bg-gray-50 dark:bg-gray-900">
+
+      <video #videoPlayer [src]="currentVideoSrc" class="w-full h-auto object-cover pointer-events-none" autoplay loop
+        muted playsinline disablePictureInPicture controlsList="nodownload noplaybackrate">
+      </video>
+
+
+
+    </div>
+
+    <h3 class="text-xl font-bold text-text-main mb-2">Reorder Your Pipeline</h3>
+    <p class="text-text-muted mb-8 text-sm leading-relaxed">
+      Drag and drop algorithms to change their execution order.
+      Enable specific steps and configure their parameters (If applicable).
+    </p>
+
+    <button class="btn-primary w-full justify-center py-3 text-base shadow-lg shadow-primary/20" (click)="close()">
+      Got it, thanks!
+    </button>
+
+  </div>
+</div>

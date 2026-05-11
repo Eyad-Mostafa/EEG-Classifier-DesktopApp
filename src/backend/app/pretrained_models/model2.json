@@ -1,0 +1,34 @@
+{
+    "id": "model2",
+    "name": "CNN-LSTM (Motor vs Imagery)",
+    "description": "CNN-LSTM model for binary classification: Motor vs Motor Imagery. Optimized for window size 100.",
+    "accuracy": 64.68,
+    "architecture": "CNN_LSTM",
+    "requirements": {
+        "num_channels": 16,
+        "time_points": 100,
+        "sampling_rate": 128,
+        "domain": "TIME"
+    },
+    "preprocessing_pipeline": [
+        {
+            "id": "bandpass_filter",
+            "params": {
+                "low_freq": 1.0,
+                "high_freq": 40.0
+            }
+        },
+        {
+            "id": "normalization",
+            "params": {}
+        }
+    ],
+    "classes": [
+        "Imagery",
+        "Motor"
+    ],
+    "files": {
+        "pth": "model2_weights.pth",
+        "image": "images/Model CNN_Lstm.png"
+    }
+}

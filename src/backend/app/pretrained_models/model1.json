@@ -1,0 +1,28 @@
+{
+  "id": "model-cnn-lstm-v1",
+  "name": "CNN-LSTM (Baseline)",
+  "description": "A 1D Convolutional Neural Network paired with an LSTM for temporal brainwave analysis.",
+  "accuracy": 46.0,
+  "architecture": "CNN-LSTM_MEAN_1",
+  "requirements": {
+    "num_channels": 16,
+    "time_points": 499,
+    "sampling_rate": 125,
+    "domain": "TIME"
+  },
+  "preprocessing_pipeline": [
+    {
+      "id": "bandpass_filter",
+      "params": { "low_freq": 1.0, "high_freq": 40.0 }
+    },
+    {
+      "id": "normalization",
+      "params": {}
+    }
+  ],
+  "classes": ["Left Hand", "Right Hand", "Feet", "Rest"],
+  "files": {
+    "pth": "model1.pth",
+    "image": "images/cnn_lstm_arch1.png"
+  }
+}

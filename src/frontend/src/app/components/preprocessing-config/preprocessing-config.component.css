@@ -1,0 +1,4 @@
+.flow-scroll {
+  scrollbar-gutter: stable both-edges;
+  min-height: 40px;
+}

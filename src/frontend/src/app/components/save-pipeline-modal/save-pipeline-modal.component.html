@@ -1,0 +1,75 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="onClose()"></div>
+
+    <!-- Modal -->
+    <div
+        class="relative bg-bg-card rounded-xl shadow-2xl border border-border-color w-full max-w-md p-6 animate-fade-in-up">
+        <h2 class="text-xl font-bold text-text-main mb-4">Save Pipeline</h2>
+
+        <div class="space-y-4">
+            <!-- Pipeline Name Input -->
+            <div>
+                <label class="block text-sm font-medium text-text-muted mb-1">Pipeline Name</label>
+                <input type="text" [(ngModel)]="pipelineName" placeholder="e.g., My Bandpass + ICA Pipeline"
+                    class="w-full px-4 py-2 rounded-lg bg-bg-main border border-border-color focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-text-main"
+                    [class.border-red-500]="showError && !pipelineName.trim()" />
+                <p *ngIf="showError && !pipelineName.trim()" class="text-red-500 text-xs mt-1">Pipeline name is required
+                </p>
+            </div>
+
+            <!-- Notes Textarea -->
+            <div>
+                <label class="block text-sm font-medium text-text-muted mb-1">Notes (Optional)</label>
+                <textarea [(ngModel)]="notes" rows="3"
+                    placeholder="Add notes about this pipeline (e.g., purpose, parameters, observations)..."
+                    class="w-full px-4 py-2 rounded-lg bg-bg-main border border-border-color focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-text-main resize-none"></textarea>
+                <p class="text-xs text-text-muted/70 mt-1">These notes will help you remember what this pipeline does
+                </p>
+            </div>
+
+            <!-- Pipeline Type Selection -->
+            <div>
+                <label class="block text-sm font-medium text-text-muted mb-2">Pipeline Type</label>
+                <div class="space-y-2">
+                    <label
+                        class="flex items-center p-3 rounded-lg border border-border-color hover:bg-bg-hover cursor-pointer transition-colors"
+                        [class.border-primary]="pipelineType === 'global'">
+                        <input type="radio" name="pipelineType" value="global" [(ngModel)]="pipelineType"
+                            class="mr-3" />
+                        <div>
+                            <span class="font-medium text-text-main">Global Pipeline</span>
+                            <p class="text-xs text-text-muted">Available for all files</p>
+                        </div>
+                    </label>
+
+                    <label
+                        class="flex items-center p-3 rounded-lg border border-border-color hover:bg-bg-hover cursor-pointer transition-colors"
+                        [class.border-primary]="pipelineType === 'file-specific'">
+                        <input type="radio" name="pipelineType" value="file-specific" [(ngModel)]="pipelineType"
+                            class="mr-3" />
+                        <div>
+                            <span class="font-medium text-text-main">File-Specific Pipeline</span>
+                            <p class="text-xs text-text-muted">Only available for <span class="font-mono">{{
+                                    currentFileName || 'current file' }}</span></p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <!-- Actions -->
+        <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-border-color">
+            <button type="button" class="px-4 py-2 text-sm font-medium text-text-muted hover:text-text-main transition-colors"
+                (click)="onClose()">
+                Cancel
+            </button>
+            <button type="button"
+                class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-hover transition-colors"
+                [disabled]="isSaving" (click)="onSave()">
+                {{ isSaving ? 'Saving...' : 'Save Pipeline' }}
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,75 @@
+{
+  "name": "eeg-classifier",
+  "productName": "EEG Classifier",
+  "version": "2.1.1",
+  "description": "Graduation Project - EEG Classifier App",
+  "author": "The EEG Project Team",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "package": "electron-builder build --win --x64"
+  },
+  "build": {
+    "appId": "com.gradproject.eeg",
+    "productName": "EEG Classifier",
+    "artifactName": "EEG.Classifier.${ext}",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "splash.html",
+      "dist/eeg-classifier-angular/**/*",
+      "icon.ico"
+    ],
+    "win": {
+      "target": "nsis",
+      "requestedExecutionLevel": "asInvoker",
+      "icon": "icon.ico",
+      "extraResources": [
+        {
+          "from": "backend-bin/backend",
+          "to": "backend"
+        }
+      ]
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "icon.png",
+      "extraResources": [
+        {
+          "from": "backend-bin/backend",
+          "to": "backend"
+        }
+      ]
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "icon.png",
+      "extraResources": [
+        {
+          "from": "backend-bin/backend",
+          "to": "backend"
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "EEG Classifier",
+      "uninstallDisplayName": "Uninstall EEG Classifier",
+      "deleteAppDataOnUninstall": true,
+      "runAfterFinish": true,
+      "license": "license.txt"
+    }
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  },
+  "dependencies": {
+    "electron-log": "^5.4.3"
+  }
+}

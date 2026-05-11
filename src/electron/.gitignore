@@ -1,0 +1,35 @@
+# --- Dependencies ---
+node_modules/
+package-lock.json # Optional: usually good to keep, but if you have conflicts, ignore it. (Keep it if possible)
+
+# --- Build Output (Angular/Electron) ---
+dist/
+out/
+build/
+release-beta/
+release/
+
+# --- Backend Binaries (Don't commit the exe!) ---
+backend-bin/
+*.exe
+*.dmg
+*.zip
+*.app
+
+# --- Python Junk (If you ever run python locally here) ---
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# --- OS System Files ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Environment Variables (Secrets) ---
+.env
+
+# --- IDE Settings (Optional) ---
+.vscode/
+.idea/

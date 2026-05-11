@@ -1,0 +1,195 @@
+<div
+  class="h-full w-full bg-bg-main p-4 md:p-6 flex flex-col items-center overflow-hidden transition-colors duration-300">
+  <div class="w-full max-w-[1400px] h-full flex flex-col gap-4">
+
+    <!-- ── Header ─────────────────────────────────────────────────────── -->
+    <div class="flex-none flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div>
+        <h1 class="text-3xl font-bold text-text-main mb-1">Preprocessing Results</h1>
+        <p class="text-base text-text-muted">Review the transformation applied to your EEG data.</p>
+      </div>
+
+      <!-- Stat chips -->
+      <div class="flex flex-wrap gap-3">
+        <div *ngFor="let stat of stats"
+          class="bg-bg-card border border-border-color px-4 py-2 rounded-xl shadow-sm flex items-center gap-2.5">
+          <i class="material-icons text-primary text-[18px]">{{ stat.icon }}</i>
+          <div>
+            <p class="text-[10px] font-bold text-text-muted uppercase tracking-wider">{{ stat.label }}</p>
+            <p class="text-sm font-bold text-text-main">{{ stat.value }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Pipeline strip ─────────────────────────────────────────────── -->
+    <div class="flex-none bg-bg-card border border-border-color rounded-xl px-5 py-4">
+      <p class="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-3">Execution Pipeline</p>
+      <div class="flex items-center overflow-x-auto custom-scrollbar gap-0 pb-1">
+        <div *ngFor="let algo of preprocessingConfig; let i = index; let isLast = last"
+          class="flex items-center flex-shrink-0">
+          <div class="flex items-center gap-2 px-3 py-1.5 bg-bg-hover rounded-full border border-border-color">
+            <span
+              class="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">
+              {{ i + 1 }}
+            </span>
+            <span class="text-sm font-semibold text-text-main whitespace-nowrap">{{ algo.name }}</span>
+            <i class="material-icons text-green-500 text-base">check_circle</i>
+          </div>
+          <div *ngIf="!isLast" class="w-6 h-px bg-border-color mx-1 flex-shrink-0"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Signal panels ──────────────────────────────────────────────── -->
+    <div class="flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-2 gap-4 pb-20">
+
+      <!-- Original -->
+      <div
+        class="bg-bg-card border border-border-color rounded-xl shadow-sm overflow-hidden flex flex-col min-h-[400px]">
+        <div class="flex-none px-5 py-3 border-b border-border-color flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-red-400"></div>
+            <h3 class="font-bold text-text-main">Original Signal</h3>
+          </div>
+          <div class="flex items-center gap-2">
+            <span
+              class="text-[11px] font-semibold bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-2.5 py-1 rounded-full border border-red-200 dark:border-red-800">
+              Raw
+            </span>
+            <!-- Zoom button -->
+            <button
+              class="w-8 h-8 rounded-lg flex items-center justify-center text-text-muted hover:text-primary hover:bg-bg-hover transition-colors"
+              (click)="openZoom(figureOriginalData, 'Original Signal')" title="Zoom in">
+              <i class="material-icons text-[18px]">zoom_out_map</i>
+            </button>
+          </div>
+        </div>
+        <div class="flex-1 flex items-center justify-center p-3 relative group cursor-zoom-in"
+          (click)="openZoom(figureOriginalData, 'Original Signal')">
+          <img *ngIf="figureOriginalData" [src]="'data:image/png;base64,' + figureOriginalData" alt="Original EEG"
+            class="w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.01]" />
+          <div *ngIf="!figureOriginalData" class="flex flex-col items-center gap-2 text-text-muted opacity-50">
+            <i class="material-icons text-4xl">image_not_supported</i>
+            <span class="text-sm">No signal data</span>
+          </div>
+          <!-- Hover hint -->
+          <div *ngIf="figureOriginalData"
+            class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <div
+              class="bg-black/50 text-white px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 backdrop-blur-sm">
+              <i class="material-icons text-sm">zoom_out_map</i> Click to zoom
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Processed -->
+      <div
+        class="bg-bg-card border border-border-color rounded-xl shadow-sm overflow-hidden flex flex-col min-h-[400px]">
+        <div class="flex-none px-5 py-3 border-b border-border-color flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-green-400"></div>
+            <h3 class="font-bold text-text-main">Processed Signal</h3>
+          </div>
+          <div class="flex items-center gap-2">
+            <span
+              class="text-[11px] font-semibold bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 px-2.5 py-1 rounded-full border border-green-200 dark:border-green-800">
+              Cleaned
+            </span>
+            <button
+              class="w-8 h-8 rounded-lg flex items-center justify-center text-text-muted hover:text-primary hover:bg-bg-hover transition-colors"
+              (click)="openZoom(figureProcessedData, 'Processed Signal')" title="Zoom in">
+              <i class="material-icons text-[18px]">zoom_out_map</i>
+            </button>
+          </div>
+        </div>
+        <div class="flex-1 flex items-center justify-center p-3 relative group cursor-zoom-in"
+          (click)="openZoom(figureProcessedData, 'Processed Signal')">
+          <img *ngIf="figureProcessedData" [src]="'data:image/png;base64,' + figureProcessedData" alt="Processed EEG"
+            class="w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.01]" />
+          <div *ngIf="!figureProcessedData" class="flex flex-col items-center gap-2 text-text-muted opacity-50">
+            <i class="material-icons text-4xl">image_not_supported</i>
+            <span class="text-sm">No signal data</span>
+          </div>
+          <div *ngIf="figureProcessedData"
+            class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <div
+              class="bg-black/50 text-white px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 backdrop-blur-sm">
+              <i class="material-icons text-sm">zoom_out_map</i> Click to zoom
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── Bottom action bar ─────────────────────────────────────────────────── -->
+<div
+  class="fixed bottom-0 left-0 w-full bg-bg-card/95 backdrop-blur-sm border-t border-border-color z-40 flex justify-center px-4">
+  <div class="w-full max-w-[1400px] py-4 flex items-center justify-between gap-4">
+
+    <button class="btn-secondary" (click)="handleBack()">
+      <i class="material-icons text-lg">arrow_back</i> Back
+    </button>
+
+    <div class="flex items-center gap-3">
+
+      <!-- ── Custom download button ── -->
+      <div class="flex flex-col items-end gap-1">
+        <button
+          class="flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-semibold transition-all duration-200 min-w-[160px] justify-center"
+          [ngClass]="{
+            'bg-bg-hover border-border-color text-text-main hover:border-primary/50 hover:text-primary': downloadState === 'idle',
+            'bg-primary/5 border-primary/30 text-primary cursor-not-allowed': downloadState === 'downloading',
+            'bg-green-500/10 border-green-500/30 text-green-500 cursor-default': downloadState === 'done',
+            'bg-red-500/10 border-red-500/30 text-red-500': downloadState === 'error'
+          }" (click)="handleDownload()" [disabled]="downloadState === 'downloading' || downloadState === 'done'">
+          <i class="material-icons text-[18px]" [class.animate-spin]="downloadState === 'downloading'">
+            {{ downloadIcon }}
+          </i>
+          {{ downloadLabel }}
+        </button>
+
+        <!-- Progress bar — only visible while downloading -->
+        <div *ngIf="downloadState === 'downloading'" class="w-full h-1 bg-border-color rounded-full overflow-hidden">
+          <div class="h-full bg-primary rounded-full transition-all duration-150" [style.width.%]="downloadProgress">
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-primary" (click)="handleContinue()">
+        Continue to Analysis
+        <i class="material-icons text-lg ml-1">arrow_forward</i>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Image zoom lightbox ───────────────────────────────────────────────── -->
+<div *ngIf="zoomedImage"
+  class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black/85 backdrop-blur-sm animate-in fade-in duration-200"
+  (click)="closeZoom()">
+
+  <!-- Header bar -->
+  <div class="flex-none w-full flex items-center justify-between px-6 py-3 pointer-events-none">
+    <span class="text-white/70 text-sm font-medium">{{ zoomedLabel }}</span>
+    <button
+      class="pointer-events-auto w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+      (click)="closeZoom()">
+      <i class="material-icons">close</i>
+    </button>
+  </div>
+
+  <!-- Image — wheel to scroll natively, Electron allows this in the lightbox -->
+  <div class="flex-1 flex items-center justify-center w-full px-6 pb-6 overflow-auto">
+    <img [src]="zoomedImage" [alt]="zoomedLabel || 'EEG signal'" class="max-w-full max-h-full object-contain rounded-xl shadow-2xl border border-white/10
+              transition-transform duration-200 cursor-zoom-in" style="image-rendering: crisp-edges;"
+      (wheel)="onZoomWheel($event)" (click)="$event.stopPropagation()" />
+  </div>
+
+  <p class="flex-none text-white/30 text-xs pb-4">Scroll to zoom · Click outside to close</p>
+</div>
